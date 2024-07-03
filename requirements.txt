@@ -1,0 +1,10 @@
+requests
+beautifulsoup4
+pandas
+datetime
+selenium
+webdriver_manager  # This is recommended for managing ChromeDriver
+pyodbc
+unidecode
+uuid
+io
