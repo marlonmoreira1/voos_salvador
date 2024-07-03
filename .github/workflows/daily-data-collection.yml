@@ -3,9 +3,7 @@ name: Daily Data Collection
 on:
   schedule:
     - cron: '0 6 * * *' 
-  push:
-    branches:
-      - main 
+   
 
 jobs:
   collect-and-load-data:
