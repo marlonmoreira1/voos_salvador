@@ -1,0 +1,28 @@
+name: Setup ODBC
+
+on: 
+  workflow_dispatch: 
+jobs:
+  setup-odbc:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.9'
+
+    - name: Setup ODBC Driver
+      run: |
+        sudo su
+        curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add -
+        curl https://packages.microsoft.com/config/ubuntu/20.04/prod.list > /etc/apt/sources.list.d/mssql-release.list
+        exit
+        sudo apt-get update
+        sudo ACCEPT_EULA=Y apt-get install -y msodbcsql17
+
+    - name: Install pyodbc
+      run: pip install pyodbc
