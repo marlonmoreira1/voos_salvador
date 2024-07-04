@@ -3,8 +3,7 @@ beautifulsoup4
 pandas
 datetime
 selenium
-webdriver_manager  # This is recommended for managing ChromeDriver
+webdriver_manager 
 pyodbc
 unidecode
 uuid
-io
