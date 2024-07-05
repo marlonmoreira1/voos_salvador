@@ -206,8 +206,8 @@ def obter_atraso_tempo(row):
         hora_prevista = pd.to_datetime(row['Hora_Prevista'], format='%H:%M') 
         hora_realizada = pd.to_datetime(row['Hora_Realizada'], format='%H:%M') 
 
-        hora_prevista_calc = pd.to_datetime(row['Hora_Prevista'])
-        hora_realizada_calc = pd.to_datetime(row['Hora_Realizada'])      
+        hora_prevista_calc = pd.to_datetime(row['Hora_Prevista'], format='%I:%M %p').strftime('%H:%M')
+        hora_realizada_calc = pd.to_datetime(row['Hora_Realizada'], format='%I:%M %p').strftime('%H:%M')      
         
 
         if hora_realizada > hora_prevista:
