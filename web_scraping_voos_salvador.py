@@ -280,9 +280,6 @@ while attempt < max_retries and not connected:
 
 cursor = conn.cursor()
 
-conn.setdecoding(pyodbc.SQL_CHAR, encoding='latin1')
-conn.setencoding('latin1')
-
 voos = voos.fillna('')
 
 insert_to_flights_stmt = '''
@@ -298,7 +295,7 @@ VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 cursor.executemany(insert_to_flights_stmt, voos.values.tolist()) 
 
 
-print(f'{len(voos)} rows inserted in pd_df_california_housing table')
+print(f'{len(voos)} rows inserted in Voos table')
            
 
 cursor.commit()        
