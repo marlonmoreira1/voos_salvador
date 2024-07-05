@@ -126,6 +126,8 @@ voos['Airline'] = voos['Airline'].str.replace(r'\-$', '', regex=True)
 
 voos[['Aircraft', 'Aircraft_type']] = voos['Aircraft'].str.extract(r'(.+)\((.+)\)')
 
-voos[['Status', 'Hora_realizada']] = voos['Status'].str.extract(r'([a-zA-Z]+)(\d{2}:\d{2})?')
+voos[['Status', 'Hora_realizada']] = voos['Status'].str.extract(r'([a-zA-Z]+)(\d{1,2}:\d{2})?')
 
-print(voos_partida.loc[voos_partida['Time']=='11;15 PM',['Status','Time']].head())
+voos['Time'] = voos['Time'].str.extract(r'(\d{1,2}:\d{2})')
+
+print(voos_partida[['Status','Time']].head(55))
