@@ -175,20 +175,20 @@ def obter_atraso_flag(row):
 
 
 
- def obter_atraso_tempo(row):
-    
+def obter_atraso_tempo(row):
+        
     if pd.isna(row['Hora_Prevista']) or pd.isna(row['Hora_Realizada']):
         return row['Hora_Realizada']
     else:
         
         hora_prevista = pd.to_datetime(row['Hora_Prevista'], format='%H:%M').strftime('%I:%M %p')
         hora_realizada = pd.to_datetime(row['Hora_Realizada'], format='%H:%M').strftime('%I:%M %p')
-
+    
         hora_prevista_calc = pd.to_datetime(row['Hora_Prevista'], format='%H:%M')
         hora_realizada_calc = pd.to_datetime(row['Hora_Realizada'], format='%H:%M')
-
-
-
+    
+    
+    
         if hora_realizada > hora_prevista:
             atraso = hora_realizada_calc - hora_prevista_calc
             horas = atraso.seconds // 3600
