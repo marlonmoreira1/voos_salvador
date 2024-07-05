@@ -7,7 +7,7 @@ on:
 
 jobs:
   collect-and-load-data:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
     - name: Checkout repository
