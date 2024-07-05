@@ -3,7 +3,7 @@ name: Daily Data Collection
 on:
   schedule:
     - cron: '0 5 * * *' 
-   
+  workflow_dispatch:
 
 jobs:
   collect-and-load-data:
@@ -31,4 +31,4 @@ jobs:
         AZURE_SQL_USER: ${{ secrets.AZURE_SQL_USER }}
         AZURE_SQL_PASSWORD: ${{ secrets.AZURE_SQL_PASSWORD }}
       run: |
-        web_scraping_voos_salvador.py
+        python web_scraping_voos_salvador.py
