@@ -130,4 +130,118 @@ voos[['Status', 'Hora_realizada']] = voos['Status'].str.extract(r'([a-zA-Z]+)(\d
 
 voos['Time'] = voos['Time'].str.extract(r'(\d{1,2}:\d{2})')
 
-print(voos[['Hora_realizada','Time']].head(55))
+url = "https://simplemaps.com/static/data/world-cities/basic/simplemaps_worldcities_basicv1.75.zip"
+
+
+response = requests.get(url)
+zip_file = zipfile.ZipFile(BytesIO(response.content))
+
+
+with zip_file.open('worldcities.csv') as file:
+    df = pd.read_csv(file)
+
+
+df['city_normalized'] = df['city'].apply(lambda x: unidecode(str(x)))
+
+
+def obter_informacoes_geograficas(cidade):
+    resultado = df[df['city_normalized'] == cidade][['city','admin_name', 'country']].values
+    if len(resultado) > 0:
+        cidade, estado, pais = resultado[0]
+        return cidade, estado, pais
+    else:
+        return None, None, None
+
+voos[['Cidade_Correta' ,'Estado/Província', 'País']] = voos['From'].apply(lambda x: pd.Series(obter_informacoes_geograficas(x)))
+
+def obter_nacionalidade(row):
+    if row != 'Brazil':
+        return 'Internacional'
+    return 'Nacional'
+
+voos['Is_National'] = voos['País'].apply(obter_nacionalidade)
+
+
+colunas_traduzidas = {
+    'Time': 'Hora_Prevista',
+    'Flight': 'Voo',
+    'From': 'Origem',
+    'Airline': 'Companhia_Aerea',
+    'Aircraft': 'Aeronave',
+    'Status': 'Status',
+    'Delay_status': 'Status_Atraso',
+    'date_flight': 'Data_Voo',
+    'direcao': 'Direcao',
+    'Aeroporto': 'Aeroporto',
+    'Aircraft_type': 'Tipo_Aeronave',
+    'Hora_realizada': 'Hora_Realizada',
+    'Estado/Província': 'Estado_Provincia',
+    'País': 'Pais',
+    'Is_National': 'Tipo_Voo',
+    'Cidade_Correta': 'Cidade_Normalizada'
+}
+
+
+voos = voos.rename(columns=colunas_traduzidas)
+
+def obter_atraso_flag(row):
+    if pd.isna(row['Hora_Prevista']) or pd.isna(row['Hora_Realizada']):
+        return row['Hora_Realizada']
+    else:        
+        hora_prevista = pd.to_datetime(row['Hora_Prevista'], '%H:%M')
+        hora_realizada = pd.to_datetime(row['Hora_Realizada'], '%H:%M')      
+
+        if hora_realizada >= hora_prevista:
+            return 'Atrasado'
+        else:
+            return 'ON-Time'
+
+
+def obter_atraso_tempo(row):
+        
+    if pd.isna(row['Hora_Prevista']) or pd.isna(row['Hora_Realizada']):
+        return row['Hora_Realizada']
+    else:
+        
+        hora_prevista = pd.to_datetime(row['Hora_Prevista'], '%H:%M') 
+        hora_realizada = pd.to_datetime(row['Hora_Realizada'], '%H:%M') 
+
+        hora_prevista_calc = pd.to_datetime(row['Hora_Prevista'])
+        hora_realizada_calc = pd.to_datetime(row['Hora_Realizada'])      
+        
+
+        if hora_realizada > hora_prevista:
+            atraso = hora_realizada_calc - hora_prevista_calc
+            horas = atraso.seconds // 3600
+            minutos = (atraso.seconds % 3600) // 60
+            return f"{horas:02}:{minutos:02}"
+        else:
+            atraso = hora_prevista_calc - hora_realizada_calc
+            horas = atraso.seconds // 3600
+            minutos = (atraso.seconds % 3600) // 60
+            return f"{horas:02}:{minutos:02}"
+
+
+
+voos['Flag'] = voos.apply(obter_atraso_flag,axis=1)
+
+voos['Atraso\Antecipado'] = voos.apply(obter_atraso_tempo,axis=1)
+
+
+def obter_status_real(row):
+    if row['Status'] == 'Canceled':
+        return row['Status']
+    elif row['Status'] == 'Diverted':
+        return row['Status']
+    elif row['Status_Atraso'] == 'red' and not (row['Status'] == 'Canceled' or row['Status'] == 'Diverted'):
+        return 'Delayed'
+    elif row['Status_Atraso'] == 'yellow':
+        return 'Delayed'
+    elif row['Status_Atraso'] == 'gray' or row['Status']=='Estimated':
+        return 'Unknown'
+    return 'ON-TIME'
+
+
+voos['Voo_Status_Real'] = voos.apply(obter_status_real,axis=1)
+
+print(voos[['Hora_Realizada','Hora_Prevista','Voo_Status_Real','Flag','Atraso\Antecipado']].head(55))
