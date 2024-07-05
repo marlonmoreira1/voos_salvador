@@ -191,8 +191,10 @@ def obter_atraso_flag(row):
         hora_prevista = pd.to_datetime(row['Hora_Prevista'])
         hora_realizada = pd.to_datetime(row['Hora_Realizada'])
         
-        if hora_prevista.hour in [1,2,3] and hora_realizada.hour in [10,11,12,13,14]:
-            hora_realizada += timedelta(hours=12)  
+        if hora_prevista.hour in [1,2,3] and hora_realizada.hour in [10,11,12]:
+            hora_prevista += timedelta(hours=12)
+        elif hora_prevista.hour in [10, 11, 12] and hora_realizada.hour in [1,2,3]:
+            hora_realizada += timedelta(hours=12)
         else:
             hora_prevista = hora_prevista
             hora_realizada = hora_realizada 
@@ -215,8 +217,10 @@ def obter_atraso_tempo(row):
         hora_prevista_calc = pd.to_datetime(row['Hora_Prevista'])
         hora_realizada_calc = pd.to_datetime(row['Hora_Realizada'])
         
-        if hora_prevista.hour in [1,2,3] and hora_realizada.hour in [10,11,12,13,14]:
-            
+        if hora_prevista.hour in [1,2,3] and hora_realizada.hour in [10,11,12]:            
+            hora_prevista += timedelta(hours=12)
+            hora_prevista_calc += timedelta(hours=12)
+        elif hora_prevista.hour in [10, 11, 12] and hora_realizada.hour in [1,2,3]:
             hora_realizada += timedelta(hours=12)
             hora_realizada_calc += timedelta(hours=12)
         else:
