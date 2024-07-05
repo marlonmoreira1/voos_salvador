@@ -111,6 +111,9 @@ data_hoje = datetime.today()
 data_ontem = data_hoje - timedelta(days=1)
 data_filtro = data_ontem.strftime('%Y-%m-%d')
 
+voos_partida = voos_partida[voos_partida['date_flight']==data_filtro]
+voos_chegada = voos_chegada[voos_chegada['date_flight']==data_filtro]
+
 voos_partida['direcao'] = 'embarque'
 voos_chegada['direcao'] = 'desembarque'
 
