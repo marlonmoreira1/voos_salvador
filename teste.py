@@ -247,9 +247,9 @@ voos['Atraso\Antecipado'] = voos.apply(obter_atraso_tempo,axis=1)
 
 
 def obter_status_real(row):
-     if row['Status'] == 'Canceled':         
+    if row['Status'] == 'Canceled':
         return row['Status']
-    elif row['Status'] == 'Diverted':        
+    elif row['Status'] == 'Diverted':
         return row['Status']
     elif row['Status_Atraso'] == 'red' and not (row['Status'] == 'Canceled' or row['Status'] == 'Diverted'):
         return 'Delayed'
