@@ -130,4 +130,4 @@ voos[['Status', 'Hora_realizada']] = voos['Status'].str.extract(r'([a-zA-Z]+)(\d
 
 voos['Time'] = voos['Time'].str.extract(r'(\d{1,2}:\d{2})')
 
-print(voos_partida[['Status','Time']].head(55))
+print(voos[['Hora_realizada','Time']].head(55))
