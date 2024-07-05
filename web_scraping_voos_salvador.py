@@ -202,20 +202,15 @@ def obter_atraso_tempo(row):
     else:
         
         hora_prevista = pd.to_datetime(row['Hora_Prevista'], dayfirst=True) - timedelta(days=1)
-        hora_realizada = pd.to_datetime(row['Hora_Realizada'], dayfirst=True) - timedelta(days=1)
-    
-        hora_prevista_calc = pd.to_datetime(row['Hora_Prevista'], dayfirst=True)
-        hora_realizada_calc = pd.to_datetime(row['Hora_Realizada'], dayfirst=True)
-    
-    
+        hora_realizada = pd.to_datetime(row['Hora_Realizada'], dayfirst=True) - timedelta(days=1)    
     
         if hora_realizada > hora_prevista:
-            atraso = hora_realizada_calc - hora_prevista_calc
+            atraso = hora_realizada - hora_prevista
             horas = atraso.seconds // 3600
             minutos = (atraso.seconds % 3600) // 60
             return f"{horas:02}:{minutos:02}"
         else:
-            atraso = hora_prevista_calc - hora_realizada_calc
+            atraso = hora_prevista - hora_realizada
             horas = atraso.seconds // 3600
             minutos = (atraso.seconds % 3600) // 60
             return f"{horas:02}:{minutos:02}"
