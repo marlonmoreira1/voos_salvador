@@ -199,7 +199,7 @@ def obter_atraso_flag(row):
             hora_prevista = hora_prevista
             hora_realizada = hora_realizada 
     
-        if hora_realizada >= hora_prevista:
+        if hora_realizada > hora_prevista:
             return 'Atrasado'
         else:
             return 'ON-Time'
@@ -249,7 +249,7 @@ def obter_status_real(row):
         return row['Status']
     elif row['Status_Atraso'] == 'red' and not (row['Status'] == 'Canceled' or row['Status'] == 'Diverted'):
         return 'Delayed'
-    elif row['Status_Atraso'] == 'yellow':
+    elif row['Status_Atraso'] == 'yellow' or pd.to_datetime(row['Atraso\Antecipado']) > pd.to_datetime('00:15'):
         return 'Delayed'
     elif row['Status_Atraso'] == 'gray' or row['Status']=='Estimated':
         return 'Unknown'
