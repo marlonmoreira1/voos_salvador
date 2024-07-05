@@ -11,15 +11,19 @@ import uuid
 import pyodbc
 from io import BytesIO
 import os
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.chrome.options import Options
+from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
 options = Options()
-options.add_argument('--ignore-certificate-errors')
-options.add_argument('--incognito')
-options.add_argument('--headless')
-driver = webdriver.Chrome(r'chrome\chromedriver-win64\chromedriver.exe', options=options)
+options.add_argument('--headless')  
+options.add_argument('--no-sandbox')
+options.add_argument('--disable-dev-shm-usage')
+
+driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
 
 arrivals_url = 'https://www.flightradar24.com/data/airports/ssa/arrivals'
 departures_url = 'https://www.flightradar24.com/data/airports/ssa/departures'
