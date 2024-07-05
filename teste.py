@@ -192,7 +192,7 @@ def obter_atraso_flag(row):
         hora_realizada = pd.to_datetime(row['Hora_Realizada'], dayfirst=True) - timedelta(days=1)
         
         if hora_prevista.hour in [1,2,3] and hora_realizada.hour in [10,11,12,13,14]:
-            hora_realizada -= timedelta(days=1)  
+            hora_prevista += timedelta(hours=12)  
         else:
             hora_prevista = hora_prevista
             hora_realizada = hora_realizada 
@@ -216,7 +216,7 @@ def obter_atraso_tempo(row):
         hora_realizada_calc = pd.to_datetime(row['Hora_Realizada'])
         
         if hora_prevista.hour in [1,2,3] and hora_realizada.hour in [10,11,12,13,14]:
-            hora_realizada -= timedelta(days=1)   
+            hora_prevista += timedelta(hours=12)   
         else:
             hora_prevista = hora_prevista
             hora_realizada = hora_realizada
