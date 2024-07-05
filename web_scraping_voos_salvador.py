@@ -255,12 +255,12 @@ connected = False
 
 while attempt < max_retries and not connected:
     try:
-        conn = pyodbc.connect(credentials,timeout=40)		
+        conn = pyodbc.connect(credentials,timeout=50)		
         connected = True
     except pyodbc.Error as e:
         print(f"Connection attempt {attempt + 1} failed: {e}")
         attempt += 1
-        time.sleep(10)
+        time.sleep(60)
 
 cursor = conn.cursor()
 
