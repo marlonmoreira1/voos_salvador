@@ -186,14 +186,15 @@ def obter_atraso_flag(row):
     if pd.isna(row['Hora_Prevista']) or pd.isna(row['Hora_Realizada']):
         return row['Hora_Realizada']
     else:
+        
         hora_prevista = pd.to_datetime(row['Hora_Prevista'], dayfirst=True) - timedelta(days=1)
         hora_realizada = pd.to_datetime(row['Hora_Realizada'], dayfirst=True) - timedelta(days=1)
         
-        if hora_prevista.hour == 0 and hora_realizada.hour > 20:
-            hora_realizada -= timedelta(days=2)  
+        if hora_prevista.hour == 0 and hora_realizada.hour > 18:
+            hora_realizada -= timedelta(days=1)  
         else:
-            hora_prevista -= timedelta(days=1)  
-            hora_realizada -= timedelta(days=1)
+            hora_prevista = hora_prevista
+            hora_realizada = hora_realizada
 
         if hora_realizada >= hora_prevista:
             return 'Atrasado'
@@ -213,12 +214,11 @@ def obter_atraso_tempo(row):
         hora_prevista_calc = pd.to_datetime(row['Hora_Prevista'])
         hora_realizada_calc = pd.to_datetime(row['Hora_Realizada'])
         
-        if hora_prevista.hour == 0 and hora_realizada.hour > 20:
-            hora_realizada -= timedelta(days=2)  
+        if hora_prevista.hour == 0 and hora_realizada.hour > 18:
+            hora_realizada -= timedelta(days=1)  
         else:
-            hora_prevista -= timedelta(days=1)  
-            hora_realizada -= timedelta(days=1)
-
+            hora_prevista = hora_prevista
+            hora_realizada = hora_realizada
 
         if hora_realizada > hora_prevista:
             atraso = hora_realizada_calc - hora_prevista_calc
