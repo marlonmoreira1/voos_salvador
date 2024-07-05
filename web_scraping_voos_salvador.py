@@ -28,10 +28,25 @@ driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), opti
 arrivals_url = 'https://www.flightradar24.com/data/airports/ssa/arrivals'
 departures_url = 'https://www.flightradar24.com/data/airports/ssa/departures'
 
+
+def fechar_overlay():
+    try:        
+        overlay = WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.CLASS_NAME, "onetrust-pc-dark-filter"))
+        )
+        fechar_botao = driver.find_element(By.ID, "onetrust-accept-btn-handler")
+        fechar_botao.click()
+    except Exception as e:
+        print("Overlay não encontrado ou erro ao fechá-lo:", e)
+
+
 def obter_voos(url):
     import time
     url = url
     driver.get(url)
+
+    fechar_overlay()
+    
     load_more_button = driver.find_element(By.XPATH, "//button[@class='btn btn-table-action btn-flights-load']")
     for _ in range(2):
         load_more_button.click()
