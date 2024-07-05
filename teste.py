@@ -128,4 +128,4 @@ voos[['Aircraft', 'Aircraft_type']] = voos['Aircraft'].str.extract(r'(.+)\((.+)\
 
 voos[['Status', 'Hora_realizada']] = voos['Status'].str.extract(r'([a-zA-Z]+)(\d{2}:\d{2})?')
 
-print(voos[['Status','Hora_realizada']].head())
+print(voos_partida[['Status','time']].head())
