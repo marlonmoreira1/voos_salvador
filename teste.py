@@ -188,8 +188,8 @@ def obter_atraso_flag(row):
     if pd.isna(row['Hora_Prevista']) or pd.isna(row['Hora_Realizada']):
         return row['Hora_Realizada']
     else:
-        hora_prevista = pd.to_datetime(row['Hora_Prevista'], dayfirst=True) - timedelta(days=1)
-        hora_realizada = pd.to_datetime(row['Hora_Realizada'], dayfirst=True) - timedelta(days=1)
+        hora_prevista = pd.to_datetime(row['Hora_Prevista'])
+        hora_realizada = pd.to_datetime(row['Hora_Realizada'])
         
         if hora_prevista.hour in [1,2,3] and hora_realizada.hour in [10,11,12,13,14]:
             hora_prevista += timedelta(hours=12)  
@@ -208,14 +208,15 @@ def obter_atraso_tempo(row):
     if pd.isna(row['Hora_Prevista']) or pd.isna(row['Hora_Realizada']):
         return row['Hora_Realizada']
     else:
+                
+        hora_prevista = pd.to_datetime(row['Hora_Prevista'])
+        hora_realizada = pd.to_datetime(row['Hora_Realizada'])
         
-        hora_prevista = pd.to_datetime(row['Hora_Prevista'], dayfirst=True) - timedelta(days=1)
-        hora_realizada = pd.to_datetime(row['Hora_Realizada'], dayfirst=True) - timedelta(days=1)
-
         hora_prevista_calc = pd.to_datetime(row['Hora_Prevista'])
         hora_realizada_calc = pd.to_datetime(row['Hora_Realizada'])
         
         if hora_prevista.hour in [1,2,3] and hora_realizada.hour in [10,11,12,13,14]:
+            
             hora_prevista += timedelta(hours=12)
             hora_prevista_calc += timedelta(hours=12)
         else:
@@ -248,7 +249,7 @@ def obter_status_real(row):
         return row['Status']
     elif row['Status_Atraso'] == 'red' and not (row['Status'] == 'Canceled' or row['Status'] == 'Diverted'):
         return 'Delayed'
-    elif row['Status_Atraso'] == 'yellow' or pd.to_datetime(row['Atraso\Antecipado'], format='%H:%M') >= pd.to_datetime('00:15', format='%H:%M'):
+    elif row['Status_Atraso'] == 'yellow':
         return 'Delayed'
     elif row['Status_Atraso'] == 'gray' or row['Status']=='Estimated':
         return 'Unknown'
