@@ -1,4 +1,4 @@
-name: Daily Data Collection
+name: Teste Coluna Hora Realizada
 
 on:   
   workflow_dispatch:
