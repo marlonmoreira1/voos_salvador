@@ -126,10 +126,11 @@ voos['Airline'] = voos['Airline'].str.replace(r'\-$', '', regex=True)
 
 voos[['Aircraft', 'Aircraft_type']] = voos['Aircraft'].str.extract(r'(.+)\((.+)\)')
 
-voos[['Status', 'Hora_realizada']] = voos['Status'].str.extract(r'([a-zA-Z]+)(\d{2}:\d{2})?')
+voos[['Status', 'Hora_realizada']] = voos['Status'].str.extract(r'([a-zA-Z]+)(\d{1,2}:\d{2})?')
+
+voos['Time'] = voos['Time'].str.extract(r'(\d{1,2}:\d{2})')
 
 url = "https://simplemaps.com/static/data/world-cities/basic/simplemaps_worldcities_basicv1.75.zip"
-
 
 response = requests.get(url)
 zip_file = zipfile.ZipFile(BytesIO(response.content))
@@ -183,19 +184,21 @@ colunas_traduzidas = {
 voos = voos.rename(columns=colunas_traduzidas)
 
 def obter_atraso_flag(row):
-    if pd.isna(row['Hora_Prevista']) or pd.isna(row['Hora_Realizada']):
+        
+    if pd.isna(row['Hora_Prevista']) or pd.isna(row['Hora_Realizada']):        
         return row['Hora_Realizada']
     else:
+        hora_prevista = pd.to_datetime(row['Hora_Prevista'])
+        hora_realizada = pd.to_datetime(row['Hora_Realizada'])
         
-        hora_prevista = pd.to_datetime(row['Hora_Prevista'], dayfirst=True) - timedelta(days=1)
-        hora_realizada = pd.to_datetime(row['Hora_Realizada'], dayfirst=True) - timedelta(days=1)
-        
-        if hora_prevista.hour == 0 and hora_realizada.hour > 18:
-            hora_realizada -= timedelta(days=1)  
+        if hora_prevista.hour in [1,2,3] and hora_realizada.hour in [10,11,12]:            
+            hora_prevista += timedelta(hours=12)
+        elif hora_prevista.hour in [10, 11, 12] and hora_realizada.hour in [1,2,3]:
+            hora_realizada += timedelta(hours=12)
         else:
             hora_prevista = hora_prevista
-            hora_realizada = hora_realizada
-
+            hora_realizada = hora_realizada 
+    
         if hora_realizada >= hora_prevista:
             return 'Atrasado'
         else:
@@ -203,19 +206,22 @@ def obter_atraso_flag(row):
 
 
 def obter_atraso_tempo(row):
-        
-    if pd.isna(row['Hora_Prevista']) or pd.isna(row['Hora_Realizada']):
+            
+    if pd.isna(row['Hora_Prevista']) or pd.isna(row['Hora_Realizada']):        
         return row['Hora_Realizada']
-    else:
+    else:                
+        hora_prevista = pd.to_datetime(row['Hora_Prevista'])
+        hora_realizada = pd.to_datetime(row['Hora_Realizada'])
         
-        hora_prevista = pd.to_datetime(row['Hora_Prevista'], dayfirst=True) - timedelta(days=1)
-        hora_realizada = pd.to_datetime(row['Hora_Realizada'], dayfirst=True) - timedelta(days=1)
-
         hora_prevista_calc = pd.to_datetime(row['Hora_Prevista'])
         hora_realizada_calc = pd.to_datetime(row['Hora_Realizada'])
         
-        if hora_prevista.hour == 0 and hora_realizada.hour > 18:
-            hora_realizada -= timedelta(days=1)  
+        if hora_prevista.hour in [1,2,3] and hora_realizada.hour in [10,11,12]:            
+            hora_prevista += timedelta(hours=12)
+            hora_prevista_calc += timedelta(hours=12)
+        elif hora_prevista.hour in [10, 11, 12] and hora_realizada.hour in [1,2,3]:            
+            hora_realizada += timedelta(hours=12)
+            hora_realizada_calc += timedelta(hours=12)
         else:
             hora_prevista = hora_prevista
             hora_realizada = hora_realizada
@@ -230,13 +236,11 @@ def obter_atraso_tempo(row):
             horas = atraso.seconds // 3600
             minutos = (atraso.seconds % 3600) // 60
             return f"{horas:02}:{minutos:02}"
-
-
+            
 
 voos['Flag'] = voos.apply(obter_atraso_flag,axis=1)
 
 voos['Atraso\Antecipado'] = voos.apply(obter_atraso_tempo,axis=1)
-
 
 def obter_status_real(row):
     if row['Status'] == 'Canceled':
@@ -262,7 +266,6 @@ credentials = (
     f'Uid={os.environ["AZURE_SQL_USER"]};'
     f'pwd={os.environ["AZURE_SQL_PASSWORD"]}'
 )
-
 
 
 max_retries = 3
