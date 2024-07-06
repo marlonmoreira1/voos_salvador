@@ -47,7 +47,8 @@ def obter_voos(url):
 
     fechar_overlay()
     
-    load_more_button = driver.find_element(By.XPATH, "//button[@class='btn btn-table-action btn-flights-load']")
+    load_more_button = WebDriverWait(driver, 10).until(
+            EC.element_to_be_clickable((By.XPATH, "//button[@class='btn btn-table-action btn-flights-load']")))
     for _ in range(2):
         load_more_button.click()
         time.sleep(15)
