@@ -47,12 +47,13 @@ def obter_voos(url):
 
     fechar_overlay()
     
-    load_more_button = driver.find_element(By.XPATH, "//button[@class='btn btn-table-action btn-flights-load']")
+    load_more_button = WebDriverWait(driver, 10).until(
+            EC.element_to_be_clickable((By.XPATH, "//button[@class='btn btn-table-action btn-flights-load']")))
     for _ in range(2):
         load_more_button.click()
-        time.sleep(25)
-    time.sleep(25)
-    element = WebDriverWait(driver, 30).until(
+        time.sleep(5)
+    time.sleep(5)
+    element = WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.XPATH, "//table[contains(@class, 'table-condensed') and contains(@class, 'table-hover') and contains(@class, 'data-table')]"))
         )
     html_content = element.get_attribute('outerHTML')
@@ -103,7 +104,7 @@ def obter_voos(url):
 
 voos_chegada = obter_voos(arrivals_url)
 
-time.sleep(30)
+time.sleep(5)
 
 voos_partida = obter_voos(departures_url)
 
@@ -178,7 +179,8 @@ colunas_traduzidas = {
     'Estado/Província': 'Estado_Provincia',
     'País': 'Pais',
     'Is_National': 'Tipo_Voo',
-    'Cidade_Correta': 'Cidade_Normalizada'
+    'Cidade_Correta': 'Cidade_Normalizada',
+    'AM-PM': 'AM-PM'
 }
 
 
@@ -262,4 +264,5 @@ def obter_status_real(row):
 
 voos['Voo_Status_Real'] = voos.apply(obter_status_real,axis=1)
 
-print(voos[['Hora_Realizada','Hora_Prevista','Voo_Status_Real','Flag','Atraso\Antecipado','AM-PM']].head(55))
+print(voos.head(5))
+print(voos.columns)
