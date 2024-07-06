@@ -128,7 +128,7 @@ voos[['Aircraft', 'Aircraft_type']] = voos['Aircraft'].str.extract(r'(.+)\((.+)\
 
 voos[['Status', 'Hora_realizada']] = voos['Status'].str.extract(r'([a-zA-Z]+)(\d{1,2}:\d{2})?')
 
-voos['Time'] = voos['Time'].str.extract(r'(\d{1,2}:\d{2})')
+voos[['Time', 'AM-PM']] = voos['Time'].str.extract(r'(\d{1,2}:\d{2})\s?(AM|PM)')
 
 url = "https://simplemaps.com/static/data/world-cities/basic/simplemaps_worldcities_basicv1.75.zip"
 
@@ -262,4 +262,4 @@ def obter_status_real(row):
 
 voos['Voo_Status_Real'] = voos.apply(obter_status_real,axis=1)
 
-print(voos[['Hora_Realizada','Hora_Prevista','Voo_Status_Real','Flag','Atraso\Antecipado']].head(55))
+print(voos[['Hora_Realizada','Hora_Prevista','Voo_Status_Real','Flag','Atraso\Antecipado','AM-PM']].head(55))
