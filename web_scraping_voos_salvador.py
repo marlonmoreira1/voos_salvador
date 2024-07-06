@@ -31,7 +31,7 @@ departures_url = 'https://www.flightradar24.com/data/airports/ssa/departures'
 
 def fechar_overlay():
     try:        
-        overlay = WebDriverWait(driver, 60).until(
+        overlay = WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.CLASS_NAME, "onetrust-pc-dark-filter"))
         )
         fechar_botao = driver.find_element(By.ID, "onetrust-accept-btn-handler")
@@ -50,9 +50,9 @@ def obter_voos(url):
     load_more_button = driver.find_element(By.XPATH, "//button[@class='btn btn-table-action btn-flights-load']")
     for _ in range(2):
         load_more_button.click()
-        time.sleep(65)
-    time.sleep(65)
-    element = WebDriverWait(driver, 60).until(
+        time.sleep(15)
+    time.sleep(5)
+    element = WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.XPATH, "//table[contains(@class, 'table-condensed') and contains(@class, 'table-hover') and contains(@class, 'data-table')]"))
         )
     html_content = element.get_attribute('outerHTML')
@@ -103,7 +103,7 @@ def obter_voos(url):
 
 voos_chegada = obter_voos(arrivals_url)
 
-time.sleep(30)
+time.sleep(10)
 
 voos_partida = obter_voos(departures_url)
 
