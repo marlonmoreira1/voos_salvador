@@ -128,7 +128,7 @@ voos[['Aircraft', 'Aircraft_type']] = voos['Aircraft'].str.extract(r'(.+)\((.+)\
 
 voos[['Status', 'Hora_realizada']] = voos['Status'].str.extract(r'([a-zA-Z]+)(\d{1,2}:\d{2})?')
 
-voos['Time'] = voos['Time'].str.extract(r'(\d{1,2}:\d{2})')
+voos[['Time', 'AM-PM']] = voos['Time'].str.extract(r'(\d{1,2}:\d{2})\s?(AM|PM)')
 
 url = "https://simplemaps.com/static/data/world-cities/basic/simplemaps_worldcities_basicv1.75.zip"
 
@@ -289,9 +289,9 @@ insert_to_flights_stmt = '''
 INSERT INTO [dbo].[Voos] (
      [Hora_Prevista], [Voo], [Origem], [Companhia_Aerea], [Aeronave], [Status], [Status_Atraso], [Data_Voo],
      [Direcao], [Aeroporto], [Tipo_Aeronave], [Hora_Realizada], [Cidade_Normalizada], [Estado_Provincia],
-    [Pais], [Tipo_Voo], [Flag], [Atraso/Antecipado], [Voo_Status_Real]
+    [Pais], [Tipo_Voo], [Flag], [Atraso/Antecipado], [Voo_Status_Real], [AM-PM]
 ) 
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 '''
 
 
