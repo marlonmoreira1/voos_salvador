@@ -289,8 +289,8 @@ voos = voos.fillna('')
 insert_to_flights_stmt = '''
 INSERT INTO [dbo].[Voos] (
      [Hora_Prevista], [Voo], [Origem], [Companhia_Aerea], [Aeronave], [Status], [Status_Atraso], [Data_Voo],
-     [Direcao], [Aeroporto], [Tipo_Aeronave], [Hora_Realizada], [Cidade_Normalizada], [Estado_Provincia],
-    [Pais], [Tipo_Voo], [Flag], [Atraso/Antecipado], [Voo_Status_Real], [AM-PM]
+     [Direcao], [Aeroporto], [Tipo_Aeronave], [Hora_Realizada], [AM-PM], [Cidade_Normalizada], [Estado_Provincia],
+    [Pais], [Tipo_Voo], [Flag], [Atraso/Antecipado], [Voo_Status_Real]
 ) 
 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 '''
