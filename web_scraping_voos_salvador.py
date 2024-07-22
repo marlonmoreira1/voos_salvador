@@ -145,7 +145,7 @@ df['city_normalized'] = df['city'].apply(lambda x: unidecode(str(x)))
 
 
 def obter_informacoes_geograficas(cidade):
-    resultado = df[df['city_normalized'] == cidade][['city','admin_name', 'country']].values
+    resultado = df[df['city_normalized'].str.lower() == cidade.lower()][['city','admin_name', 'country']].values
     if len(resultado) > 0:
         cidade, estado, pais = resultado[0]
         return cidade, estado, pais
