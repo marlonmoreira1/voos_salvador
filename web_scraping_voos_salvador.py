@@ -49,54 +49,56 @@ def obter_voos(url):
     
     load_more_button = WebDriverWait(driver, 10).until(
             EC.element_to_be_clickable((By.XPATH, "//button[@class='btn btn-table-action btn-flights-load']")))
-    for _ in range(2):
-        load_more_button.click()
-        time.sleep(10)
-    time.sleep(5)
-    element = WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((By.XPATH, "//table[contains(@class, 'table-condensed') and contains(@class, 'table-hover') and contains(@class, 'data-table')]"))
-        )
-    html_content = element.get_attribute('outerHTML')
-
+    try:
+        for _ in range(2):
+            load_more_button.click()
+            time.sleep(10)
+    except:
+        time.sleep(5)
+        element = WebDriverWait(driver, 10).until(
+                EC.presence_of_element_located((By.XPATH, "//table[contains(@class, 'table-condensed') and contains(@class, 'table-hover') and contains(@class, 'data-table')]"))
+            )
+        html_content = element.get_attribute('outerHTML')
     
-    soup = BeautifulSoup(html_content, 'html.parser')
-
-    
-    table = soup.find('table', class_='table table-condensed table-hover data-table m-n-t-15')
-    flights = []
-    
-    if table:
-        rows = table.find('tbody').find_all('tr')
-
         
-        for row in rows:
-            columns = row.find_all('td')
-            if len(columns) > 1:
-
-                time = columns[0].get_text(strip=True)
-                flight = columns[1].get_text(strip=True)
-                origin = columns[2].get_text(strip=True)
-                airline = columns[3].get_text(strip=True)
-                aircraft = columns[4].get_text(strip=True)
-                status = columns[6].get_text(strip=True)
-                status_div = row.find('div', class_='state-block')
-                status_color = status_div.get('class')[1] if status_div else 'unknown'
-                data_date = row.get('data-date')
-                first_date_obj = datetime.strptime(data_date, '%A, %b %d').replace(year=datetime.now().year)
-                first_date_str = first_date_obj.strftime('%Y-%m-%d')
-
-                
-                flights.append({
-                    'Time': time,
-                    'Flight': flight,
-                    'From': origin,
-                    'Airline': airline,
-                    'Aircraft': aircraft,
-                    'Status': status,
-                    'Delay_status':status_color,
-                    'date_flight':first_date_str
-                })
-    voos = pd.DataFrame(flights)
+        soup = BeautifulSoup(html_content, 'html.parser')
+    
+        
+        table = soup.find('table', class_='table table-condensed table-hover data-table m-n-t-15')
+        flights = []
+        
+        if table:
+            rows = table.find('tbody').find_all('tr')
+    
+            
+            for row in rows:
+                columns = row.find_all('td')
+                if len(columns) > 1:
+    
+                    time = columns[0].get_text(strip=True)
+                    flight = columns[1].get_text(strip=True)
+                    origin = columns[2].get_text(strip=True)
+                    airline = columns[3].get_text(strip=True)
+                    aircraft = columns[4].get_text(strip=True)
+                    status = columns[6].get_text(strip=True)
+                    status_div = row.find('div', class_='state-block')
+                    status_color = status_div.get('class')[1] if status_div else 'unknown'
+                    data_date = row.get('data-date')
+                    first_date_obj = datetime.strptime(data_date, '%A, %b %d').replace(year=datetime.now().year)
+                    first_date_str = first_date_obj.strftime('%Y-%m-%d')
+    
+                    
+                    flights.append({
+                        'Time': time,
+                        'Flight': flight,
+                        'From': origin,
+                        'Airline': airline,
+                        'Aircraft': aircraft,
+                        'Status': status,
+                        'Delay_status':status_color,
+                        'date_flight':first_date_str
+                    })
+        voos = pd.DataFrame(flights)
 
     return voos
 
