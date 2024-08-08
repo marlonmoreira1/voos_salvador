@@ -50,9 +50,9 @@ def obter_voos(url):
     load_more_button = WebDriverWait(driver, 10).until(
             EC.element_to_be_clickable((By.XPATH, "//button[@class='btn btn-table-action btn-flights-load']")))
     try:
-        for _ in range(2):
+        for _ in range(4):
             load_more_button.click()
-            time.sleep(10)
+            time.sleep(5)
     except:
         time.sleep(5)
         element = WebDriverWait(driver, 10).until(
