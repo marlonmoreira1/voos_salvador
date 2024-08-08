@@ -271,3 +271,4 @@ voos['Voo_Status_Real'] = voos.apply(obter_status_real,axis=1)
 
 print(voos.head(5))
 print(voos.columns)
+print(voos.shape)
