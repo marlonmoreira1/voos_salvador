@@ -197,9 +197,9 @@ def obter_atraso_flag(row):
         hora_prevista = pd.to_datetime(row['Hora_Prevista'])
         hora_realizada = pd.to_datetime(row['Hora_Realizada'])
         
-        if hora_prevista.hour in [1,2,3,4,5,6,7,8,9] and hora_realizada.hour in [10,11,12]:            
+        if hora_prevista.hour <= 9 and hora_realizada.hour >= 10:            
             hora_prevista += timedelta(hours=12)
-        elif hora_prevista.hour in [10, 11, 12] and hora_realizada.hour in [1,2,3,4,5,6,7,8,9]:
+        elif hora_prevista.hour >= 10 and hora_realizada.hour <= 9:
             hora_realizada += timedelta(hours=12)
         else:
             hora_prevista = hora_prevista
@@ -222,10 +222,10 @@ def obter_atraso_tempo(row):
         hora_prevista_calc = pd.to_datetime(row['Hora_Prevista'])
         hora_realizada_calc = pd.to_datetime(row['Hora_Realizada'])
         
-        if hora_prevista.hour in [1,2,3,4,5,6,7,8,9] and hora_realizada.hour in [10,11,12]:            
+        if hora_prevista.hour <= 9 and hora_realizada.hour >= 10:            
             hora_prevista += timedelta(hours=12)
             hora_prevista_calc += timedelta(hours=12)
-        elif hora_prevista.hour in [10, 11, 12] and hora_realizada.hour in [1,2,3,4,5,6,7,8,9]:            
+        elif hora_prevista.hour >= 10 and hora_realizada.hour <= 9:            
             hora_realizada += timedelta(hours=12)
             hora_realizada_calc += timedelta(hours=12)
         else:
@@ -285,7 +285,7 @@ while attempt < max_retries and not connected:
     except pyodbc.Error as e:
         print(f"Connection attempt {attempt + 1} failed: {e}")
         attempt += 1
-        time.sleep(20)
+        time.sleep(10)
 
 cursor = conn.cursor()
 
