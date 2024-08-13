@@ -124,151 +124,151 @@ voos_partida['direcao'] = 'embarque'
 voos_chegada['direcao'] = 'desembarque'
 
 voos = pd.concat([voos_partida, voos_chegada], ignore_index=True)
-print(voos['Status'])
-# voos[['From', 'Aeroporto']] = voos['From'].str.extract(r'(.+)\((.+)\)-')
 
-# voos['Airline'] = voos['Airline'].str.replace(r'\s*\(.*?\)-', '', regex=True)
-# voos['Airline'] = voos['Airline'].str.replace(r'\-$', '', regex=True)
+voos[['From', 'Aeroporto']] = voos['From'].str.extract(r'(.+)\((.+)\)-')
 
-# voos[['Aircraft', 'Aircraft_type']] = voos['Aircraft'].str.extract(r'(.+)\((.+)\)')
+voos['Airline'] = voos['Airline'].str.replace(r'\s*\(.*?\)-', '', regex=True)
+voos['Airline'] = voos['Airline'].str.replace(r'\-$', '', regex=True)
 
-# voos[['Status', 'Hora_realizada']] = voos['Status'].str.extract(r'([a-zA-Z]+)(\d{1,2}:\d{2})?')
+voos[['Aircraft', 'Aircraft_type']] = voos['Aircraft'].str.extract(r'(.+)\((.+)\)')
 
-# voos[['Time', 'AM-PM']] = voos['Time'].str.extract(r'(\d{1,2}:\d{2})\s?(AM|PM)')
+voos[['Status', 'Hora_realizada','AM-PM_Realizado']] = voos['Status'].str.extract(r'([a-zA-Z]+)(\d{1,2}:\d{2})?(AM|PM)')
 
-# url = "https://simplemaps.com/static/data/world-cities/basic/simplemaps_worldcities_basicv1.75.zip"
+voos[['Time', 'AM-PM_Previsto']] = voos['Time'].str.extract(r'(\d{1,2}:\d{2})\s?(AM|PM)')
 
-
-# response = requests.get(url)
-# zip_file = zipfile.ZipFile(BytesIO(response.content))
+url = "https://simplemaps.com/static/data/world-cities/basic/simplemaps_worldcities_basicv1.75.zip"
 
 
-# with zip_file.open('worldcities.csv') as file:
-#     df = pd.read_csv(file)
+response = requests.get(url)
+zip_file = zipfile.ZipFile(BytesIO(response.content))
 
 
-# df['city_normalized'] = df['city'].apply(lambda x: unidecode(str(x)))
+with zip_file.open('worldcities.csv') as file:
+    df = pd.read_csv(file)
 
 
-# def obter_informacoes_geograficas(cidade):
-#     resultado = df[df['city_normalized'] == cidade][['city','admin_name', 'country']].values
-#     if len(resultado) > 0:
-#         cidade, estado, pais = resultado[0]
-#         return cidade, estado, pais
-#     else:
-#         return None, None, None
-
-# voos[['Cidade_Correta' ,'Estado/Província', 'País']] = voos['From'].apply(lambda x: pd.Series(obter_informacoes_geograficas(x)))
-
-# def obter_nacionalidade(row):
-#     if row != 'Brazil':
-#         return 'Internacional'
-#     return 'Nacional'
-
-# voos['Is_National'] = voos['País'].apply(obter_nacionalidade)
+df['city_normalized'] = df['city'].apply(lambda x: unidecode(str(x)))
 
 
-# colunas_traduzidas = {
-#     'Time': 'Hora_Prevista',
-#     'Flight': 'Voo',
-#     'From': 'Origem',
-#     'Airline': 'Companhia_Aerea',
-#     'Aircraft': 'Aeronave',
-#     'Status': 'Status',
-#     'Delay_status': 'Status_Atraso',
-#     'date_flight': 'Data_Voo',
-#     'direcao': 'Direcao',
-#     'Aeroporto': 'Aeroporto',
-#     'Aircraft_type': 'Tipo_Aeronave',
-#     'Hora_realizada': 'Hora_Realizada',
-#     'Estado/Província': 'Estado_Provincia',
-#     'País': 'Pais',
-#     'Is_National': 'Tipo_Voo',
-#     'Cidade_Correta': 'Cidade_Normalizada',
-#     'AM-PM': 'AM-PM'
-# }
+def obter_informacoes_geograficas(cidade):
+    resultado = df[df['city_normalized'] == cidade][['city','admin_name', 'country']].values
+    if len(resultado) > 0:
+        cidade, estado, pais = resultado[0]
+        return cidade, estado, pais
+    else:
+        return None, None, None
+
+voos[['Cidade_Correta' ,'Estado/Província', 'País']] = voos['From'].apply(lambda x: pd.Series(obter_informacoes_geograficas(x)))
+
+def obter_nacionalidade(row):
+    if row != 'Brazil':
+        return 'Internacional'
+    return 'Nacional'
+
+voos['Is_National'] = voos['País'].apply(obter_nacionalidade)
 
 
-# voos = voos.rename(columns=colunas_traduzidas)
+colunas_traduzidas = {
+    'Time': 'Hora_Prevista',
+    'Flight': 'Voo',
+    'From': 'Origem',
+    'Airline': 'Companhia_Aerea',
+    'Aircraft': 'Aeronave',
+    'Status': 'Status',
+    'Delay_status': 'Status_Atraso',
+    'date_flight': 'Data_Voo',
+    'direcao': 'Direcao',
+    'Aeroporto': 'Aeroporto',
+    'Aircraft_type': 'Tipo_Aeronave',
+    'Hora_realizada': 'Hora_Realizada',
+    'Estado/Província': 'Estado_Provincia',
+    'País': 'Pais',
+    'Is_National': 'Tipo_Voo',
+    'Cidade_Correta': 'Cidade_Normalizada',
+    'AM-PM': 'AM-PM'
+}
 
-# def obter_atraso_flag(row):
-#     if pd.isna(row['Hora_Prevista']) or pd.isna(row['Hora_Realizada']):
-#         return row['Hora_Realizada']
-#     else:
-#         hora_prevista = pd.to_datetime(row['Hora_Prevista'])
-#         hora_realizada = pd.to_datetime(row['Hora_Realizada'])
+
+voos = voos.rename(columns=colunas_traduzidas)
+
+def obter_atraso_flag(row):
+    if pd.isna(row['Hora_Prevista']) or pd.isna(row['Hora_Realizada']):
+        return row['Hora_Realizada']
+    else:
+        hora_prevista = pd.to_datetime(row['Hora_Prevista'])
+        hora_realizada = pd.to_datetime(row['Hora_Realizada'])
         
-#         if hora_prevista.hour in [1,2,3] and hora_realizada.hour in [10,11,12]:
-#             hora_prevista += timedelta(hours=12)
-#         elif hora_prevista.hour in [10, 11, 12] and hora_realizada.hour in [1,2,3]:
-#             hora_realizada += timedelta(hours=12)
-#         else:
-#             hora_prevista = hora_prevista
-#             hora_realizada = hora_realizada 
+        if hora_prevista.hour in [1,2,3] and hora_realizada.hour in [10,11,12]:
+            hora_prevista += timedelta(hours=12)
+        elif hora_prevista.hour in [10, 11, 12] and hora_realizada.hour in [1,2,3]:
+            hora_realizada += timedelta(hours=12)
+        else:
+            hora_prevista = hora_prevista
+            hora_realizada = hora_realizada 
 
-#         if hora_realizada > hora_prevista:
-#             return 'Atrasado'
-#         else:
-#             return 'ON-Time'
+        if hora_realizada > hora_prevista:
+            return 'Atrasado'
+        else:
+            return 'ON-Time'
 
 
-# def obter_atraso_tempo(row):
+def obter_atraso_tempo(row):
         
-#     if pd.isna(row['Hora_Prevista']) or pd.isna(row['Hora_Realizada']):
-#         return row['Hora_Realizada']
-#     else:
+    if pd.isna(row['Hora_Prevista']) or pd.isna(row['Hora_Realizada']):
+        return row['Hora_Realizada']
+    else:
                 
-#         hora_prevista = pd.to_datetime(row['Hora_Prevista'])
-#         hora_realizada = pd.to_datetime(row['Hora_Realizada'])
+        hora_prevista = pd.to_datetime(row['Hora_Prevista'])
+        hora_realizada = pd.to_datetime(row['Hora_Realizada'])
         
-#         hora_prevista_calc = pd.to_datetime(row['Hora_Prevista'])
-#         hora_realizada_calc = pd.to_datetime(row['Hora_Realizada'])
+        hora_prevista_calc = pd.to_datetime(row['Hora_Prevista'])
+        hora_realizada_calc = pd.to_datetime(row['Hora_Realizada'])
         
-#         if hora_prevista.hour in [1,2,3] and hora_realizada.hour in [10,11,12]:            
-#             hora_prevista += timedelta(hours=12)
-#             hora_prevista_calc += timedelta(hours=12)
-#         elif hora_prevista.hour in [10, 11, 12] and hora_realizada.hour in [1,2,3]:
-#             hora_realizada += timedelta(hours=12)
-#             hora_realizada_calc += timedelta(hours=12)
-#         else:
-#             hora_prevista = hora_prevista
-#             hora_realizada = hora_realizada
+        if hora_prevista.hour in [1,2,3] and hora_realizada.hour in [10,11,12]:            
+            hora_prevista += timedelta(hours=12)
+            hora_prevista_calc += timedelta(hours=12)
+        elif hora_prevista.hour in [10, 11, 12] and hora_realizada.hour in [1,2,3]:
+            hora_realizada += timedelta(hours=12)
+            hora_realizada_calc += timedelta(hours=12)
+        else:
+            hora_prevista = hora_prevista
+            hora_realizada = hora_realizada
 
 
-#         if hora_realizada > hora_prevista:
-#             atraso = hora_realizada_calc - hora_prevista_calc
-#             horas = atraso.seconds // 3600
-#             minutos = (atraso.seconds % 3600) // 60
-#             return f"{horas:02}:{minutos:02}"
-#         else:
-#             atraso = hora_prevista_calc - hora_realizada_calc
-#             horas = atraso.seconds // 3600
-#             minutos = (atraso.seconds % 3600) // 60
-#             return f"{horas:02}:{minutos:02}"
+        if hora_realizada > hora_prevista:
+            atraso = hora_realizada_calc - hora_prevista_calc
+            horas = atraso.seconds // 3600
+            minutos = (atraso.seconds % 3600) // 60
+            return f"{horas:02}:{minutos:02}"
+        else:
+            atraso = hora_prevista_calc - hora_realizada_calc
+            horas = atraso.seconds // 3600
+            minutos = (atraso.seconds % 3600) // 60
+            return f"{horas:02}:{minutos:02}"
 
 
 
-# voos['Flag'] = voos.apply(obter_atraso_flag,axis=1)
+voos['Flag'] = voos.apply(obter_atraso_flag,axis=1)
 
-# voos['Atraso\Antecipado'] = voos.apply(obter_atraso_tempo,axis=1)
-
-
-# def obter_status_real(row):
-#     if row['Status'] == 'Canceled':
-#         return row['Status']
-#     elif row['Status'] == 'Diverted':
-#         return row['Status']
-#     elif row['Status_Atraso'] == 'red' and not (row['Status'] == 'Canceled' or row['Status'] == 'Diverted'):
-#         return 'Delayed'
-#     elif row['Status_Atraso'] == 'yellow' or pd.to_datetime(row['Atraso\Antecipado']) >= pd.to_datetime('00:15'):
-#         return 'Delayed'
-#     elif row['Status_Atraso'] == 'gray' or row['Status']=='Estimated':
-#         return 'Unknown'
-#     return 'ON-TIME'
+voos['Atraso\Antecipado'] = voos.apply(obter_atraso_tempo,axis=1)
 
 
-# voos['Voo_Status_Real'] = voos.apply(obter_status_real,axis=1)
+def obter_status_real(row):
+    if row['Status'] == 'Canceled':
+        return row['Status']
+    elif row['Status'] == 'Diverted':
+        return row['Status']
+    elif row['Status_Atraso'] == 'red' and not (row['Status'] == 'Canceled' or row['Status'] == 'Diverted'):
+        return 'Delayed'
+    elif row['Status_Atraso'] == 'yellow' or pd.to_datetime(row['Atraso\Antecipado']) >= pd.to_datetime('00:15'):
+        return 'Delayed'
+    elif row['Status_Atraso'] == 'gray' or row['Status']=='Estimated':
+        return 'Unknown'
+    return 'ON-TIME'
 
-# print(voos.head(5))
-# print(voos.columns)
-# print(voos.shape)
+
+voos['Voo_Status_Real'] = voos.apply(obter_status_real,axis=1)
+
+print(voos.head(5))
+print(voos.columns)
+print(voos.shape)
