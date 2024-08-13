@@ -194,11 +194,11 @@ voos = voos.rename(columns=colunas_traduzidas)
 def is_null(row):
     if pd.isna(row['Hora_Prevista']) or pd.isna(row['Hora_Realizada']): 
         return row['Hora_Realizada']
-    return row  
+    
 
 def obter_atraso_flag(row):
     
-    row = is_null(row)
+    is_null(row)
     
     hora_prevista = pd.to_datetime(row['Hora_Prevista'])
     hora_realizada = pd.to_datetime(row['Hora_Realizada']) 
@@ -229,7 +229,7 @@ def obter_diff(hora_realizada,hora_prevista,row):
 
 def obter_atraso_tempo(row):
 
-    row = is_null(row)   
+    is_null(row)   
     
     hora_prevista_calc = pd.to_datetime(row['Hora_Prevista'])
     hora_realizada_calc = pd.to_datetime(row['Hora_Realizada'])     
