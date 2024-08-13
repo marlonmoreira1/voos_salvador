@@ -224,26 +224,20 @@ def obter_atraso_tempo(row):
         hora_prevista_calc = pd.to_datetime(row['Hora_Prevista'])
         hora_realizada_calc = pd.to_datetime(row['Hora_Realizada'])
         
-        if row['AM-PM_Previsto'] == 'AM' and row['AM-PM_Realizado'] == 'PM':            
-            hora_prevista += timedelta(hours=12)
-            hora_prevista_calc += timedelta(hours=12)
-        elif row['AM-PM_Previsto'] == 'PM' and row['AM-PM_Realizado'] == 'AM':            
-            hora_realizada += timedelta(hours=12)
-            hora_realizada_calc += timedelta(hours=12)
+        atraso = hora_realizada_calc - hora_prevista_calc
+        
+        if (row['AM-PM_Previsto'] == 'PM' and hora_prevista.hour == 12) and row['AM-PM_Realizado'] == 'AM':            
+            atraso += timedelta(hours=24)
+            
+        elif (hora_prevista.hour > hora_realizada.hour) or (row['AM-PM_Previsto'] == 'PM' and row['AM-PM_Realizado'] == 'AM'):            
+            atraso += timedelta(hours=12)
+        
         else:
-            hora_prevista = hora_prevista
-            hora_realizada = hora_realizada
-
-        if hora_realizada > hora_prevista:
-            atraso = hora_realizada_calc - hora_prevista_calc
-            horas = atraso.seconds // 3600
-            minutos = (atraso.seconds % 3600) // 60
-            return f"{horas:02}:{minutos:02}"
-        else:
-            atraso = hora_prevista_calc - hora_realizada_calc
-            horas = atraso.seconds // 3600
-            minutos = (atraso.seconds % 3600) // 60
-            return f"{horas:02}:{minutos:02}"
+            atraso        
+            
+        horas = atraso.seconds // 3600
+        minutos = (atraso.seconds % 3600) // 60
+        return f"{horas:02}:{minutos:02}"
             
 
 voos['Flag'] = voos.apply(obter_atraso_flag,axis=1)
