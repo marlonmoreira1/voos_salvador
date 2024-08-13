@@ -192,20 +192,21 @@ colunas_traduzidas = {
 voos = voos.rename(columns=colunas_traduzidas)
 
 def obter_atraso_flag(row):
-    if pd.isna(row['Hora_Prevista']) or pd.isna(row['Hora_Realizada']):
+        
+    if pd.isna(row['Hora_Prevista']) or pd.isna(row['Hora_Realizada']):        
         return row['Hora_Realizada']
     else:
         hora_prevista = pd.to_datetime(row['Hora_Prevista'])
         hora_realizada = pd.to_datetime(row['Hora_Realizada'])
         
-        if hora_prevista.hour in [1,2,3] and hora_realizada.hour in [10,11,12]:
+        if row['Hora_Prevista'] == 'AM' and row['Hora_Realizada'] == 'PM':            
             hora_prevista += timedelta(hours=12)
-        elif hora_prevista.hour in [10, 11, 12] and hora_realizada.hour in [1,2,3]:
+        elif row['Hora_Prevista'] == 'PM' and row['Hora_Realizada'] == 'AM':
             hora_realizada += timedelta(hours=12)
         else:
             hora_prevista = hora_prevista
             hora_realizada = hora_realizada 
-
+    
         if hora_realizada > hora_prevista:
             return 'Atrasado'
         else:
@@ -213,27 +214,25 @@ def obter_atraso_flag(row):
 
 
 def obter_atraso_tempo(row):
-        
-    if pd.isna(row['Hora_Prevista']) or pd.isna(row['Hora_Realizada']):
+            
+    if pd.isna(row['Hora_Prevista']) or pd.isna(row['Hora_Realizada']):        
         return row['Hora_Realizada']
-    else:
-                
+    else:                
         hora_prevista = pd.to_datetime(row['Hora_Prevista'])
         hora_realizada = pd.to_datetime(row['Hora_Realizada'])
         
         hora_prevista_calc = pd.to_datetime(row['Hora_Prevista'])
         hora_realizada_calc = pd.to_datetime(row['Hora_Realizada'])
         
-        if hora_prevista.hour in [1,2,3] and hora_realizada.hour in [10,11,12]:            
+        if row['Hora_Prevista'] == 'AM' and row['Hora_Realizada'] == 'PM':            
             hora_prevista += timedelta(hours=12)
             hora_prevista_calc += timedelta(hours=12)
-        elif hora_prevista.hour in [10, 11, 12] and hora_realizada.hour in [1,2,3]:
+        elif row['Hora_Prevista'] == 'PM' and row['Hora_Realizada'] == 'AM':            
             hora_realizada += timedelta(hours=12)
             hora_realizada_calc += timedelta(hours=12)
         else:
             hora_prevista = hora_prevista
             hora_realizada = hora_realizada
-
 
         if hora_realizada > hora_prevista:
             atraso = hora_realizada_calc - hora_prevista_calc
@@ -245,13 +244,11 @@ def obter_atraso_tempo(row):
             horas = atraso.seconds // 3600
             minutos = (atraso.seconds % 3600) // 60
             return f"{horas:02}:{minutos:02}"
-
-
+            
 
 voos['Flag'] = voos.apply(obter_atraso_flag,axis=1)
 
 voos['Atraso\Antecipado'] = voos.apply(obter_atraso_tempo,axis=1)
-
 
 def obter_status_real(row):
     if row['Status'] == 'Canceled':
@@ -260,7 +257,7 @@ def obter_status_real(row):
         return row['Status']
     elif row['Status_Atraso'] == 'red' and not (row['Status'] == 'Canceled' or row['Status'] == 'Diverted'):
         return 'Delayed'
-    elif row['Status_Atraso'] == 'yellow' or pd.to_datetime(row['Atraso\Antecipado']) >= pd.to_datetime('00:15'):
+    elif row['Status_Atraso'] == 'yellow' and pd.to_datetime(row['Atraso\Antecipado']) > pd.to_datetime('00:15'):
         return 'Delayed'
     elif row['Status_Atraso'] == 'gray' or row['Status']=='Estimated':
         return 'Unknown'
