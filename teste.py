@@ -199,9 +199,9 @@ def obter_atraso_flag(row):
         hora_prevista = pd.to_datetime(row['Hora_Prevista'])
         hora_realizada = pd.to_datetime(row['Hora_Realizada'])
         
-        if row['Hora_Prevista'] == 'AM' and row['Hora_Realizada'] == 'PM':            
+        if row['AM-PM_Previsto'] == 'AM' and row['AM-PM_Realizado'] == 'PM':            
             hora_prevista += timedelta(hours=12)
-        elif row['Hora_Prevista'] == 'PM' and row['Hora_Realizada'] == 'AM':
+        elif row['AM-PM_Previsto'] == 'PM' and row['AM-PM_Realizado'] == 'AM':
             hora_realizada += timedelta(hours=12)
         else:
             hora_prevista = hora_prevista
@@ -224,10 +224,10 @@ def obter_atraso_tempo(row):
         hora_prevista_calc = pd.to_datetime(row['Hora_Prevista'])
         hora_realizada_calc = pd.to_datetime(row['Hora_Realizada'])
         
-        if row['Hora_Prevista'] == 'AM' and row['Hora_Realizada'] == 'PM':            
+        if row['AM-PM_Previsto'] == 'AM' and row['AM-PM_Realizado'] == 'PM':            
             hora_prevista += timedelta(hours=12)
             hora_prevista_calc += timedelta(hours=12)
-        elif row['Hora_Prevista'] == 'PM' and row['Hora_Realizada'] == 'AM':            
+        elif row['AM-PM_Previsto'] == 'PM' and row['AM-PM_Realizado'] == 'AM':            
             hora_realizada += timedelta(hours=12)
             hora_realizada_calc += timedelta(hours=12)
         else:
