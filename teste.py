@@ -124,7 +124,7 @@ voos_partida['direcao'] = 'embarque'
 voos_chegada['direcao'] = 'desembarque'
 
 voos = pd.concat([voos_partida, voos_chegada], ignore_index=True)
-
+print(voos['Status'].head(40))
 voos[['From', 'Aeroporto']] = voos['From'].str.extract(r'(.+)\((.+)\)-')
 
 voos['Airline'] = voos['Airline'].str.replace(r'\s*\(.*?\)-', '', regex=True)
@@ -133,7 +133,7 @@ voos['Airline'] = voos['Airline'].str.replace(r'\-$', '', regex=True)
 voos[['Aircraft', 'Aircraft_type']] = voos['Aircraft'].str.extract(r'(.+)\((.+)\)')
 
 voos[['Status', 'Hora_realizada','AM-PM_Realizado']] = voos['Status'].str.extract(r'([a-zA-Z]+)(\d{1,2}:\d{2})\s?(AM|PM)')
-
+print(voos[['Hora_realizada','AM-PM_Realizado']].head(40))
 voos[['Time', 'AM-PM_Previsto']] = voos['Time'].str.extract(r'(\d{1,2}:\d{2})\s?(AM|PM)')
 
 url = "https://simplemaps.com/static/data/world-cities/basic/simplemaps_worldcities_basicv1.75.zip"
