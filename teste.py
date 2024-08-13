@@ -185,7 +185,8 @@ colunas_traduzidas = {
     'País': 'Pais',
     'Is_National': 'Tipo_Voo',
     'Cidade_Correta': 'Cidade_Normalizada',
-    'AM-PM': 'AM-PM'
+    'AM-PM_Previsto':'AM-PM_Previsto',
+    'AM-PM_Realizado':'AM-PM_Realizado''
 }
 
 
@@ -267,6 +268,6 @@ def obter_status_real(row):
 
 voos['Voo_Status_Real'] = voos.apply(obter_status_real,axis=1)
 
-print(voos[['Hora_Prevista','Hora_Realizada','Flag','Voo_Status_Real','Atraso\Antecipado']].head(40))
+print(voos[['Hora_Prevista','Hora_Realizada','Voo_Status_Real','Atraso\Antecipado','AM-PM_Previsto','AM-PM_Realizado']].head(40))
 print(voos.columns)
 print(voos.shape)
