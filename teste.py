@@ -186,7 +186,7 @@ colunas_traduzidas = {
     'Is_National': 'Tipo_Voo',
     'Cidade_Correta': 'Cidade_Normalizada',
     'AM-PM_Previsto':'AM-PM_Previsto',
-    'AM-PM_Realizado':'AM-PM_Realizado''
+    'AM-PM_Realizado':'AM-PM_Realizado'
 }
 
 
