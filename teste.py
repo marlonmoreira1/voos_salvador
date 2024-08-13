@@ -268,6 +268,7 @@ def obter_status_real(row):
 
 voos['Voo_Status_Real'] = voos.apply(obter_status_real,axis=1)
 
-print(voos[['Hora_Prevista','Hora_Realizada','Voo_Status_Real','Atraso\Antecipado','AM-PM_Previsto','AM-PM_Realizado']].head(40))
+print(voos[['Hora_Prevista','Hora_Realizada','Voo_Status_Real','Atraso\Antecipado']].head(40))
+print(voos[['Hora_Prevista','Hora_Realizada','Atraso\Antecipado','AM-PM_Previsto','AM-PM_Realizado']].head(40))
 print(voos.columns)
 print(voos.shape)
