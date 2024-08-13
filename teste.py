@@ -218,16 +218,21 @@ def obter_atraso_flag(row):
 
 def obter_diff(hora_realizada,hora_prevista,row):    
 
-    if hora_prevista.hour == 12 and not row['AM-PM_Previsto'] == 'AM':
+   if hora_prevista.hour == 12 and not row['AM-PM_Previsto'] == 'AM':
         hora_realizada += timedelta(hours=12)
         atraso = hora_realizada - hora_prevista
         atraso += timedelta(hours=12)
+        return atraso
+        
+    elif (hora_prevista.hour > hora_realizada.hour and not hora_prevista.hour == 12) and row['AM-PM_Previsto'] == row['AM-PM_Realizado']:
+        atraso = hora_prevista - hora_realizada       
         return atraso
     
     elif (hora_prevista.hour > hora_realizada.hour) or (row['AM-PM_Previsto'] == 'PM' and row['AM-PM_Realizado'] == 'AM'):
         hora_realizada += timedelta(hours=12)
         atraso = hora_realizada - hora_prevista        
-        return atraso        
+        return atraso
+    
     else:
         atraso = hora_realizada - hora_prevista
         return atraso
