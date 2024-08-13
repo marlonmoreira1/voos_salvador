@@ -124,7 +124,7 @@ voos_partida['direcao'] = 'embarque'
 voos_chegada['direcao'] = 'desembarque'
 
 voos = pd.concat([voos_partida, voos_chegada], ignore_index=True)
-print(voos)
+print(voos['Status'])
 # voos[['From', 'Aeroporto']] = voos['From'].str.extract(r'(.+)\((.+)\)-')
 
 # voos['Airline'] = voos['Airline'].str.replace(r'\s*\(.*?\)-', '', regex=True)
