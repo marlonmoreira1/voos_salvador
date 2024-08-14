@@ -218,11 +218,11 @@ def obter_atraso_flag(row):
 
 def obter_diff(hora_realizada,hora_prevista,row):    
     
-    if hora_prevista.hour <= 9 and hora_realizada.hour >= 10:
+    if row['AM-PM_Previsto'] != row['AM-PM_Realizado'] and (hora_prevista.hour <= 9 and hora_realizada.hour >= 10):
         hora_prevista += timedelta(hours=12)
         return hora_prevista,hora_realizada
             
-    elif hora_prevista.hour >= 10 and hora_realizada.hour <= 9:            
+    elif row['AM-PM_Previsto'] != row['AM-PM_Realizado'] and (hora_prevista.hour >= 10 and hora_realizada.hour <= 9):            
         hora_realizada += timedelta(hours=12)
         return hora_prevista,hora_realizada
 
