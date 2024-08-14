@@ -247,9 +247,16 @@ def obter_atraso_tempo(row):
     
     hora_prevista, hora_realizada = obter_diff(hora_realizada_calc,hora_prevista_calc,row)    
        
-    horas = atraso.seconds // 3600
-    minutos = (atraso.seconds % 3600) // 60
-    return f"{horas:02}:{minutos:02}"
+    if hora_realizada > hora_prevista:
+            atraso = hora_realizada - hora_prevista
+            horas = atraso.seconds // 3600
+            minutos = (atraso.seconds % 3600) // 60
+            return f"{horas:02}:{minutos:02}"
+        else:
+            atraso = hora_prevista - hora_realizada
+            horas = atraso.seconds // 3600
+            minutos = (atraso.seconds % 3600) // 60
+            return f"{horas:02}:{minutos:02}"
             
 
 voos['Flag'] = voos.apply(obter_atraso_flag,axis=1)
