@@ -217,25 +217,23 @@ def obter_atraso_flag(row):
    
 
 def obter_diff(hora_realizada,hora_prevista,row):    
+    
+    if hora_prevista.hour <= 9 and hora_realizada.hour >= 10:
+        hora_prevista += timedelta(hours=12)
+        return hora_prevista,hora_realizada
+            
+    elif hora_prevista.hour >= 10 and hora_realizada.hour <= 9:            
+        hora_realizada += timedelta(hours=12)
+        return hora_prevista,hora_realizada
 
-   if hora_prevista.hour == 12 and not row['AM-PM_Previsto'] == 'AM':
-       hora_realizada += timedelta(hours=12)
-       atraso = hora_realizada - hora_prevista
-       atraso += timedelta(hours=12)
-       return atraso
-        
-   elif (hora_prevista.hour > hora_realizada.hour and not hora_prevista.hour == 12) and row['AM-PM_Previsto'] == row['AM-PM_Realizado']:
-       atraso = hora_prevista - hora_realizada       
-       return atraso
+    elif row['AM-PM_Previsto'] == 'PM' and row['AM-PM_Realizado'] == 'AM':
+        hora_prevista += timedelta(hours=12)
+        return hora_prevista,hora_realizada
     
-   elif (hora_prevista.hour > hora_realizada.hour) or (row['AM-PM_Previsto'] == 'PM' and row['AM-PM_Realizado'] == 'AM'):
-       hora_realizada += timedelta(hours=12)
-       atraso = hora_realizada - hora_prevista        
-       return atraso
-    
-   else:
-       atraso = hora_realizada - hora_prevista
-       return atraso
+    else:
+        hora_prevista = hora_prevista
+        hora_realizada = hora_realizada
+        return hora_prevista,hora_realizada
 
 def obter_atraso_tempo(row):
 
@@ -247,8 +245,8 @@ def obter_atraso_tempo(row):
     hora_prevista_calc = pd.to_datetime(row['Hora_Prevista'])
     hora_realizada_calc = pd.to_datetime(row['Hora_Realizada'])     
     
-    atraso = obter_diff(hora_realizada_calc,hora_prevista_calc,row)     
-        
+    hora_prevista, hora_realizada = obter_diff(hora_realizada_calc,hora_prevista_calc,row)    
+       
     horas = atraso.seconds // 3600
     minutos = (atraso.seconds % 3600) // 60
     return f"{horas:02}:{minutos:02}"
