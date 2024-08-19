@@ -275,48 +275,48 @@ def obter_status_real(row):
 voos['Voo_Status_Real'] = voos.apply(obter_status_real,axis=1)
 
 
-credentials = (
-    'Driver={ODBC Driver 17 for SQL Server};'
-    f'Server={os.environ["AZURE_SQL_SERVER"]};'
-    f'Database={os.environ["AZURE_SQL_DATABASE"]};'
-    f'Uid={os.environ["AZURE_SQL_USER"]};'
-    f'pwd={os.environ["AZURE_SQL_PASSWORD"]}'
-)
+# credentials = (
+#     'Driver={ODBC Driver 17 for SQL Server};'
+#     f'Server={os.environ["AZURE_SQL_SERVER"]};'
+#     f'Database={os.environ["AZURE_SQL_DATABASE"]};'
+#     f'Uid={os.environ["AZURE_SQL_USER"]};'
+#     f'pwd={os.environ["AZURE_SQL_PASSWORD"]}'
+# )
 
 
-max_retries = 3
-attempt = 0
-connected = False
+# max_retries = 3
+# attempt = 0
+# connected = False
 
-while attempt < max_retries and not connected:
-    try:
-        conn = pyodbc.connect(credentials,timeout=20)		
-        connected = True
-    except pyodbc.Error as e:
-        print(f"Connection attempt {attempt + 1} failed: {e}")
-        attempt += 1
-        time.sleep(10)
+# while attempt < max_retries and not connected:
+#     try:
+#         conn = pyodbc.connect(credentials,timeout=20)		
+#         connected = True
+#     except pyodbc.Error as e:
+#         print(f"Connection attempt {attempt + 1} failed: {e}")
+#         attempt += 1
+#         time.sleep(10)
 
-cursor = conn.cursor()
+# cursor = conn.cursor()
 
-voos = voos.fillna('')
+# voos = voos.fillna('')
 
-insert_to_flights_stmt = '''
-INSERT INTO [dbo].[Voos] (
-     [Hora_Prevista], [Voo], [Origem], [Companhia_Aerea], [Aeronave], [Status], [Status_Atraso], [Data_Voo],
-     [Direcao], [Aeroporto], [Tipo_Aeronave], [Hora_Realizada], [AM-PM_Previsto], [Cidade_Normalizada], [Estado_Provincia],
-    [Pais], [Tipo_Voo], [Flag], [Atraso/Antecipado], [Voo_Status_Real]
-) 
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-'''
-
-
-cursor.executemany(insert_to_flights_stmt, voos.values.tolist()) 
+# insert_to_flights_stmt = '''
+# INSERT INTO [dbo].[Voos] (
+#      [Hora_Prevista], [Voo], [Origem], [Companhia_Aerea], [Aeronave], [Status], [Status_Atraso], [Data_Voo],
+#      [Direcao], [Aeroporto], [Tipo_Aeronave], [Hora_Realizada], [AM-PM_Previsto], [Cidade_Normalizada], [Estado_Provincia],
+#     [Pais], [Tipo_Voo], [Flag], [Atraso/Antecipado], [Voo_Status_Real]
+# ) 
+# VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+# '''
 
 
-print(f'{len(voos)} rows inserted in Voos table')
+# cursor.executemany(insert_to_flights_stmt, voos.values.tolist()) 
+
+
+# print(f'{len(voos)} rows inserted in Voos table')
            
 
-cursor.commit()        
-cursor.close()
-conn.close()
+# cursor.commit()        
+# cursor.close()
+# conn.close()
