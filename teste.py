@@ -197,6 +197,15 @@ def is_null(row):
         return row['Hora_Realizada']
     return None
 
+
+def convert_to_24h(time_str, am_pm):
+    time_obj = datetime.strptime(time_str, '%I:%M:%S')
+    if am_pm == 'PM' and time_obj.hour != 12:
+        time_obj += timedelta(hours=12)
+    elif am_pm == 'AM' and time_obj.hour == 12:
+        time_obj -= timedelta(hours=12)
+    return time_obj
+
 def obter_atraso_flag(row):
     
     result = is_null(row)
@@ -216,24 +225,17 @@ def obter_atraso_flag(row):
         return 'ON-Time'
    
 
-def obter_diff(hora_realizada,hora_prevista,row):    
+def obter_diff(hora_prevista,hora_realizada,am_pm_previsto,am_pm_realizado):
     
-    if row['AM-PM_Previsto'] != row['AM-PM_Realizado'] and (hora_prevista.hour <= 9 and hora_realizada.hour >= 10):
-        hora_prevista += timedelta(hours=12)
-        return hora_prevista,hora_realizada
-            
-    elif row['AM-PM_Previsto'] != row['AM-PM_Realizado'] and (hora_prevista.hour >= 10 and hora_realizada.hour <= 9):            
-        hora_realizada += timedelta(hours=12)
-        return hora_prevista,hora_realizada
-
-    elif row['AM-PM_Previsto'] == 'PM' and row['AM-PM_Realizado'] == 'AM':
-        hora_prevista += timedelta(hours=12)
-        return hora_prevista,hora_realizada
-    
+    if hora_prevista > hora_realizada and (am_pm_previsto == am_pm_realizado):
+        atraso = hora_prevista - hora_realizada
     else:
-        hora_prevista = hora_prevista
-        hora_realizada = hora_realizada
-        return hora_prevista,hora_realizada
+        atraso = hora_realizada - hora_prevista
+    
+    
+    if atraso < timedelta(0):
+        atraso += timedelta(days=1)
+    return atraso
 
 def obter_atraso_tempo(row):
 
@@ -242,21 +244,14 @@ def obter_atraso_tempo(row):
     if result is not None:
         return result
     
-    hora_prevista_calc = pd.to_datetime(row['Hora_Prevista'])
-    hora_realizada_calc = pd.to_datetime(row['Hora_Realizada'])     
+    hora_prevista = convert_to_24h(row['Hora_Prevista'], row['AM-PM_Previsto'])
+    hora_realizada = convert_to_24h(row['Hora_Realizada'], row['AM-PM_Realizado'])
     
-    hora_prevista, hora_realizada = obter_diff(hora_realizada_calc,hora_prevista_calc,row)    
-       
-    if hora_realizada > hora_prevista:
-        atraso = hora_realizada - hora_prevista
-        horas = atraso.seconds // 3600
-        minutos = (atraso.seconds % 3600) // 60
-        return f"{horas:02}:{minutos:02}"
-    else:        
-        atraso = hora_prevista - hora_realizada
-        horas = atraso.seconds // 3600
-        minutos = (atraso.seconds % 3600) // 60
-        return f"{horas:02}:{minutos:02}"
+    atraso = obter_diff(hora_prevista,hora_realizada,row['AM-PM_Previsto'],row['AM-PM_Realizado'])
+    
+    horas = atraso.seconds // 3600
+    minutos = (atraso.seconds % 3600) // 60
+    return f"{horas:02}:{minutos:02}"
             
 
 voos['Flag'] = voos.apply(obter_atraso_flag,axis=1)
