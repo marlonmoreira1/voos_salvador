@@ -189,59 +189,67 @@ colunas_traduzidas = {
 
 voos = voos.rename(columns=colunas_traduzidas)
 
-def obter_atraso_flag(row):
-        
-    if pd.isna(row['Hora_Prevista']) or pd.isna(row['Hora_Realizada']):        
+def is_null(row):
+    if pd.isna(row['Hora_Prevista']) or pd.isna(row['Hora_Realizada']): 
         return row['Hora_Realizada']
-    else:
-        hora_prevista = pd.to_datetime(row['Hora_Prevista'])
-        hora_realizada = pd.to_datetime(row['Hora_Realizada'])
-        
-        if hora_prevista.hour <= 9 and hora_realizada.hour >= 10:            
-            hora_prevista += timedelta(hours=12)
-        elif hora_prevista.hour >= 10 and hora_realizada.hour <= 9:
-            hora_realizada += timedelta(hours=12)
-        else:
-            hora_prevista = hora_prevista
-            hora_realizada = hora_realizada 
+    return None
+
+
+def convert_to_24h(time_str, am_pm):
+    time_obj = datetime.strptime(time_str, '%I:%M')
+    if am_pm == 'PM' and time_obj.hour != 12:
+        time_obj += timedelta(hours=12)
+    elif am_pm == 'AM' and time_obj.hour == 12:
+        time_obj -= timedelta(hours=12)
+    return time_obj
     
-        if hora_realizada > hora_prevista:
-            return 'Atrasado'
-        else:
-            return 'ON-Time'
+
+def obter_atraso_flag(row):
+    
+    result = is_null(row)
+
+    if result is not None:
+        return result
+    
+    hora_prevista = pd.to_datetime(row['Hora_Prevista'])
+    hora_realizada = pd.to_datetime(row['Hora_Realizada']) 
+        
+    if (hora_prevista.hour > hora_realizada.hour) or (row['AM-PM_Previsto'] == 'PM' and row['AM-PM_Realizado'] == 'AM'):            
+        hora_realizada += timedelta(hours=12)    
+
+    if hora_realizada > hora_prevista:
+        return 'Atrasado'
+    else:
+        return 'ON-Time'
+   
+
+def obter_diff(hora_prevista,hora_realizada,am_pm_previsto,am_pm_realizado):
+    
+    if hora_prevista > hora_realizada and (am_pm_previsto == am_pm_realizado):
+        atraso = hora_prevista - hora_realizada
+    else:
+        atraso = hora_realizada - hora_prevista    
+    
+    if atraso < timedelta(0):
+        atraso += timedelta(days=1)
+    return atraso
 
 
 def obter_atraso_tempo(row):
-            
-    if pd.isna(row['Hora_Prevista']) or pd.isna(row['Hora_Realizada']):        
-        return row['Hora_Realizada']
-    else:                
-        hora_prevista = pd.to_datetime(row['Hora_Prevista'])
-        hora_realizada = pd.to_datetime(row['Hora_Realizada'])
-        
-        hora_prevista_calc = pd.to_datetime(row['Hora_Prevista'])
-        hora_realizada_calc = pd.to_datetime(row['Hora_Realizada'])
-        
-        if hora_prevista.hour <= 9 and hora_realizada.hour >= 10:            
-            hora_prevista += timedelta(hours=12)
-            hora_prevista_calc += timedelta(hours=12)
-        elif hora_prevista.hour >= 10 and hora_realizada.hour <= 9:            
-            hora_realizada += timedelta(hours=12)
-            hora_realizada_calc += timedelta(hours=12)
-        else:
-            hora_prevista = hora_prevista
-            hora_realizada = hora_realizada
+    
+    result = is_null(row)
 
-        if hora_realizada > hora_prevista:
-            atraso = hora_realizada_calc - hora_prevista_calc
-            horas = atraso.seconds // 3600
-            minutos = (atraso.seconds % 3600) // 60
-            return f"{horas:02}:{minutos:02}"
-        else:
-            atraso = hora_prevista_calc - hora_realizada_calc
-            horas = atraso.seconds // 3600
-            minutos = (atraso.seconds % 3600) // 60
-            return f"{horas:02}:{minutos:02}"
+    if result is not None:
+        return result
+    
+    hora_prevista = convert_to_24h(row['Hora_Prevista'], row['AM-PM_Previsto'])
+    hora_realizada = convert_to_24h(row['Hora_Realizada'], row['AM-PM_Realizado'])
+    
+    atraso = obter_diff(hora_prevista,hora_realizada,row['AM-PM_Previsto'],row['AM-PM_Realizado'])
+    
+    horas = atraso.seconds // 3600
+    minutos = (atraso.seconds % 3600) // 60
+    return f"{horas:02}:{minutos:02}"
             
 
 voos['Flag'] = voos.apply(obter_atraso_flag,axis=1)
