@@ -134,7 +134,7 @@ voos[['Aircraft', 'Aircraft_type']] = voos['Aircraft'].str.extract(r'(.+)\((.+)\
 
 voos[['Status', 'Hora_realizada','AM-PM_Realizado']] = voos['Status'].str.extract(r'([a-zA-Z\s\.]+)(\d{1,2}:\d{2})?\s?(AM|PM)?')
 
-voos[['Time', 'AM-PM']] = voos['Time'].str.extract(r'(\d{1,2}:\d{2})\s?(AM|PM)')
+voos[['Time', 'AM-PM_Previsto']] = voos['Time'].str.extract(r'(\d{1,2}:\d{2})\s?(AM|PM)')
 
 url = "https://simplemaps.com/static/data/world-cities/basic/simplemaps_worldcities_basicv1.75.zip"
 
