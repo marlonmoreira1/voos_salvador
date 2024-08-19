@@ -265,7 +265,7 @@ def obter_status_real(row):
         return 'Delayed'
     elif row['Status_Atraso'] == 'yellow' and pd.to_datetime(row['Atraso\Antecipado']) > pd.to_datetime('00:15'):
         return 'Delayed'
-    elif row['Status_Atraso'] == 'gray' or row['Status']=='Estimated':
+    elif row['Status_Atraso'] == 'gray':
         return 'Unknown'
     return 'ON-TIME'
 
