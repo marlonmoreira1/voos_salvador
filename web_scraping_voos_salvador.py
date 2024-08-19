@@ -316,6 +316,6 @@ cursor.executemany(insert_to_flights_stmt, voos.values.tolist())
 print(f'{len(voos)} rows inserted in Voos table')
            
 
-# cursor.commit()        
-# cursor.close()
-# conn.close()
+cursor.commit()        
+cursor.close()
+conn.close()
