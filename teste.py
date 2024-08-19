@@ -199,7 +199,7 @@ def is_null(row):
 
 
 def convert_to_24h(time_str, am_pm):
-    time_obj = datetime.strptime(time_str, '%I:%M:%S')
+    time_obj = datetime.strptime(time_str, '%I:%M')
     if am_pm == 'PM' and time_obj.hour != 12:
         time_obj += timedelta(hours=12)
     elif am_pm == 'AM' and time_obj.hour == 12:
