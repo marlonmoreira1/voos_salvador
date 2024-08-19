@@ -183,7 +183,9 @@ colunas_traduzidas = {
     'Estado/Província': 'Estado_Provincia',
     'País': 'Pais',
     'Is_National': 'Tipo_Voo',
-    'Cidade_Correta': 'Cidade_Normalizada'
+    'Cidade_Correta': 'Cidade_Normalizada',
+    'AM-PM_Previsto':'AM-PM_Previsto',
+    'AM-PM_Realizado':'AM-PM_Realizado'
 }
 
 
@@ -302,7 +304,7 @@ voos = voos.fillna('')
 insert_to_flights_stmt = '''
 INSERT INTO [dbo].[Voos] (
      [Hora_Prevista], [Voo], [Origem], [Companhia_Aerea], [Aeronave], [Status], [Status_Atraso], [Data_Voo],
-     [Direcao], [Aeroporto], [Tipo_Aeronave], [Hora_Realizada], [AM-PM], [Cidade_Normalizada], [Estado_Provincia],
+     [Direcao], [Aeroporto], [Tipo_Aeronave], [Hora_Realizada], [AM-PM_Previsto], [Cidade_Normalizada], [Estado_Provincia],
     [Pais], [Tipo_Voo], [Flag], [Atraso/Antecipado], [Voo_Status_Real]
 ) 
 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
