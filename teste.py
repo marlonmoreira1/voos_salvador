@@ -281,7 +281,8 @@ def is_null(row):
 
 def convert_to_24h(time_str, am_pm):
     if pd.isna(am_pm):
-        return time_str
+        time_obj = datetime.strptime(time_str, '%H:%M')
+        return time_obj
     time_obj = datetime.strptime(time_str, '%I:%M')
     if am_pm == 'PM' and time_obj.hour != 12:
         time_obj += timedelta(hours=12)
