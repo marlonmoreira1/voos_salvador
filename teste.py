@@ -291,8 +291,8 @@ def is_null(row):
     return None
 
 
-def convert_to_24h(time_str, am_pm):
-    if pd.isna(am_pm):
+def convert_to_24h(time_str, am_pm,status):
+    if status == 'Known':
         time_obj = datetime.strptime(time_str, '%H:%M')
         return time_obj
     time_obj = datetime.strptime(time_str, '%I:%M')
@@ -343,8 +343,8 @@ def obter_atraso_tempo(row):
     if result is not None:
         return result
     
-    hora_prevista = convert_to_24h(row['Hora_Prevista'], row['AM-PM_Previsto'])
-    hora_realizada = convert_to_24h(row['Hora_Realizada'], row['AM-PM_Realizado'])
+    hora_prevista = convert_to_24h(row['Hora_Prevista'], row['AM-PM_Previsto'],row['Status'])
+    hora_realizada = convert_to_24h(row['Hora_Realizada'], row['AM-PM_Realizado'],row['Status'])
     
     atraso = obter_diff(hora_prevista,hora_realizada,row['AM-PM_Previsto'],row['AM-PM_Realizado'])
     
