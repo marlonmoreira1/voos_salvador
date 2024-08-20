@@ -212,9 +212,21 @@ def atualizar_status(row):
     return row['Status']
 
 
+def am_pm_realizado(row):
+
+    if row['Status'] == 'Known':
+        hora_realizada = pd.to_datetime(row['Hora_realizada'])
+        if hora_realizada.hour > 12:
+            return 'PM'
+        else:
+            return 'AM'
+    return row['AM-PM_Realizado']
+
 voos['Hora_realizada'] = voos.apply(atualizar_hora, axis=1)
 
 voos['Status'] = voos.apply(atualizar_status, axis=1)
+
+voos['AM-PM_Realizado'] = voos.apply(am_pm_realizado, axis=1)
 
 
 url = "https://simplemaps.com/static/data/world-cities/basic/simplemaps_worldcities_basicv1.75.zip"
