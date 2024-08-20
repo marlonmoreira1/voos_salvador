@@ -124,7 +124,7 @@ voos_partida['direcao'] = 'embarque'
 voos_chegada['direcao'] = 'desembarque'
 
 voos = pd.concat([voos_partida, voos_chegada], ignore_index=True)
-print(voos['Status'].head(40))
+
 voos[['From', 'Aeroporto']] = voos['From'].str.extract(r'(.+)\((.+)\)-')
 
 voos['Airline'] = voos['Airline'].str.replace(r'\s*\(.*?\)-', '', regex=True)
@@ -133,8 +133,89 @@ voos['Airline'] = voos['Airline'].str.replace(r'\-$', '', regex=True)
 voos[['Aircraft', 'Aircraft_type']] = voos['Aircraft'].str.extract(r'(.+)\((.+)\)')
 
 voos[['Status', 'Hora_realizada','AM-PM_Realizado']] = voos['Status'].str.extract(r'([a-zA-Z\s\.]+)(\d{1,2}:\d{2})?\s?(AM|PM)?')
-print(voos[['Hora_realizada','AM-PM_Realizado']].head(40))
+
 voos[['Time', 'AM-PM_Previsto']] = voos['Time'].str.extract(r'(\d{1,2}:\d{2})\s?(AM|PM)')
+
+
+def converter_data(data_str):
+    """Converte uma data no formato YYYY-MM-DD para o formato 'ddd, d mmm'"""
+    data_obj = datetime.strptime(data_str, "%Y-%m-%d")
+    dias_semana = ["seg", "ter", "qua", "qui", "sex", "sab","dom"]
+    meses = ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"]
+    
+    dia_semana = dias_semana[data_obj.weekday()]
+    dia = data_obj.day
+    mes = meses[data_obj.month - 1]
+    
+    return f"{dia_semana}, {dia} {mes}"
+
+
+def buscar_horario_chegada(numero_voo,data_desejada):
+    base_url = "https://br.trip.com/flights/status-"
+    url = base_url + numero_voo      
+    driver.get(url)
+    
+    time.sleep(5)  
+
+    try:
+        
+        data_formatada = converter_data(data_desejada)        
+        
+        soup = BeautifulSoup(driver.page_source, 'html.parser')        
+        
+        tabela = soup.find('table')
+        
+        if tabela:
+            
+            linhas = tabela.find_all('tr')            
+            
+            for linha in linhas:
+                colunas = linha.find_all('td')
+                if len(colunas) > 6:
+                    data_linha = colunas[1].text.strip() 
+                    chegada = colunas[7].text.strip()
+                    status = colunas[8].text.strip()
+                    if status == 'Cancelado':
+                        return status
+                    else:
+                        if data_formatada == data_linha:
+                            return chegada
+        else:
+            return "Tabela não encontrada"
+    except Exception as e:
+        print(f"Erro ao buscar dados: {e}")
+        return "Erro"
+
+
+def atualizar_hora(row):
+    if row['Status'] == 'Unknown':             
+        
+        horario = buscar_horario_chegada(row['Flight'],row['date_flight'])
+        
+        if horario == 'Cancelado':
+            return row['Hora_realizada']
+
+        return horario        
+        
+    return row['Hora_realizada']
+
+
+def atualizar_status(row):
+    if row['Status'] == 'Unknown':
+        
+        status = buscar_horario_chegada(row['Flight'],row['date_flight'])
+        
+        if status == 'Cancelado':
+            return 'Canceled'
+        return 'Known'            
+        
+    return row['Status']
+
+
+voos['Hora_realizada'] = voos.apply(atualizar_hora, axis=1)
+
+voos['Status'] = voos.apply(atualizar_status, axis=1)
+
 
 url = "https://simplemaps.com/static/data/world-cities/basic/simplemaps_worldcities_basicv1.75.zip"
 
@@ -276,8 +357,8 @@ def obter_status_real(row):
 
 
 voos['Voo_Status_Real'] = voos.apply(obter_status_real,axis=1)
-voos = voos[voos['Companhia_Aerea']=='GOL Linhas Aereas']
-print(voos[['Hora_Prevista','Hora_Realizada','Voo_Status_Real','Atraso\Antecipado']].head(55))
-print(voos[['Hora_Prevista','Hora_Realizada','Atraso\Antecipado','AM-PM_Previsto','AM-PM_Realizado']].head(55))
-print(voos.columns)
+gol = voos[voos['Companhia_Aerea']=='GOL Linhas Aereas']
+print(gol[['Hora_Prevista','Hora_Realizada','Voo_Status_Real','Atraso\Antecipado']].head(55))
+mudado = voos[voos['Status']=='Known']
+print(mudado[['Hora_Prevista','Hora_Realizada','Voo_Status_Real','Atraso\Antecipado']].head(55))
 print(voos.shape)
