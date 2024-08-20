@@ -303,12 +303,13 @@ voos = voos.fillna('')
 insert_to_flights_stmt = '''
 INSERT INTO [dbo].[Voos] (
      [Hora_Prevista], [Voo], [Origem], [Companhia_Aerea], [Aeronave], [Status], [Status_Atraso], [Data_Voo],
-     [Direcao], [Aeroporto], [Tipo_Aeronave], [Hora_Realizada], [AM-PM_Previsto], [Cidade_Normalizada], [Estado_Provincia],
+     [Direcao], [Aeroporto], [Tipo_Aeronave], [Hora_Realizada], [AM-PM], [Cidade_Normalizada], [Estado_Provincia],
     [Pais], [Tipo_Voo], [Flag], [Atraso/Antecipado], [Voo_Status_Real]
 ) 
 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 '''
 
+voos = voos.drop('AM-PM_Realizado', axis=1)
 
 cursor.executemany(insert_to_flights_stmt, voos.values.tolist()) 
 
