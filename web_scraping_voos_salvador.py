@@ -308,7 +308,10 @@ def obter_atraso_flag(row):
         return result
     
     hora_prevista = pd.to_datetime(row['Hora_Prevista'])
-    hora_realizada = pd.to_datetime(row['Hora_Realizada']) 
+    hora_realizada = pd.to_datetime(row['Hora_Realizada'])
+
+    if hora_realizada.hour > 12:
+        hora_realizada -= timedelta(hours=12)
         
     if (hora_prevista.hour > hora_realizada.hour) or (row['AM-PM_Previsto'] == 'PM' and row['AM-PM_Realizado'] == 'AM'):            
         hora_realizada += timedelta(hours=12)    
