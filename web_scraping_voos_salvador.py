@@ -136,6 +136,97 @@ voos[['Status', 'Hora_realizada','AM-PM_Realizado']] = voos['Status'].str.extrac
 
 voos[['Time', 'AM-PM_Previsto']] = voos['Time'].str.extract(r'(\d{1,2}:\d{2})\s?(AM|PM)')
 
+def converter_data(data_str):
+    """Converte uma data no formato YYYY-MM-DD para o formato 'ddd, d mmm'"""
+    data_obj = datetime.strptime(data_str, "%Y-%m-%d")
+    dias_semana = ["seg", "ter", "qua", "qui", "sex", "sab","dom"]
+    meses = ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"]
+    
+    dia_semana = dias_semana[data_obj.weekday()]
+    dia = data_obj.day
+    mes = meses[data_obj.month - 1]
+    
+    return f"{dia_semana}, {dia} {mes}"
+
+
+def buscar_horario_chegada(numero_voo,data_desejada):
+    base_url = "https://br.trip.com/flights/status-"
+    url = base_url + numero_voo      
+    driver.get(url)
+    
+    time.sleep(5)  
+
+    try:
+        
+        data_formatada = converter_data(data_desejada)        
+        
+        soup = BeautifulSoup(driver.page_source, 'html.parser')        
+        
+        tabela = soup.find('table')
+        
+        if tabela:
+            
+            linhas = tabela.find_all('tr')            
+            
+            for linha in linhas:
+                colunas = linha.find_all('td')
+                if len(colunas) > 6:
+                    data_linha = colunas[1].text.strip() 
+                    chegada = colunas[7].text.strip()
+                    status = colunas[8].text.strip()
+                    if status == 'Cancelado':
+                        return status
+                    else:
+                        if data_formatada == data_linha:
+                            return chegada
+        else:
+            return "Tabela não encontrada"
+    except Exception as e:
+        print(f"Erro ao buscar dados: {e}")
+        return "Erro"
+
+
+def atualizar_hora(row):
+    if row['Status'] == 'Unknown':             
+        
+        horario = buscar_horario_chegada(row['Flight'],row['date_flight'])
+        
+        if horario == 'Cancelado':
+            return row['Hora_realizada']
+
+        return horario        
+        
+    return row['Hora_realizada']
+
+
+def atualizar_status(row):
+    if row['Status'] == 'Unknown':
+        
+        status = buscar_horario_chegada(row['Flight'],row['date_flight'])
+        
+        if status == 'Cancelado':
+            return 'Canceled'
+        return 'Known'            
+        
+    return row['Status']
+
+
+def am_pm_realizado(row):
+
+    if row['Status'] == 'Known':
+        hora_realizada = pd.to_datetime(row['Hora_realizada'])
+        if hora_realizada.hour > 12:
+            return 'PM'
+        else:
+            return 'AM'
+    return row['AM-PM_Realizado']
+
+voos['Hora_realizada'] = voos.apply(atualizar_hora, axis=1)
+
+voos['Status'] = voos.apply(atualizar_status, axis=1)
+
+voos['AM-PM_Realizado'] = voos.apply(am_pm_realizado, axis=1)
+
 url = "https://simplemaps.com/static/data/world-cities/basic/simplemaps_worldcities_basicv1.75.zip"
 
 response = requests.get(url)
@@ -197,7 +288,10 @@ def is_null(row):
     return None
 
 
-def convert_to_24h(time_str, am_pm):
+def convert_to_24h(time_str, am_pm,status,tipo):
+    if status == 'Known' and tipo == 'realizado':
+        time_obj = datetime.strptime(time_str, '%H:%M')
+        return time_obj
     time_obj = datetime.strptime(time_str, '%I:%M')
     if am_pm == 'PM' and time_obj.hour != 12:
         time_obj += timedelta(hours=12)
@@ -229,6 +323,8 @@ def obter_diff(hora_prevista,hora_realizada,am_pm_previsto,am_pm_realizado):
     
     if hora_prevista.hour == 0 and (am_pm_previsto == 'AM' and am_pm_realizado == 'PM'):
         atraso = hora_prevista - hora_realizada
+    elif hora_prevista.hour == 12 and (am_pm_previsto == 'PM' and am_pm_realizado == 'AM'):
+        atraso = hora_prevista - hora_realizada
     elif hora_prevista > hora_realizada and (am_pm_previsto == am_pm_realizado):
         atraso = hora_prevista - hora_realizada
     else:
@@ -246,8 +342,8 @@ def obter_atraso_tempo(row):
     if result is not None:
         return result
     
-    hora_prevista = convert_to_24h(row['Hora_Prevista'], row['AM-PM_Previsto'])
-    hora_realizada = convert_to_24h(row['Hora_Realizada'], row['AM-PM_Realizado'])
+    hora_prevista = convert_to_24h(row['Hora_Prevista'], row['AM-PM_Previsto'],row['Status'],'previsto')
+    hora_realizada = convert_to_24h(row['Hora_Realizada'], row['AM-PM_Realizado'],row['Status'],'realizado')
     
     atraso = obter_diff(hora_prevista,hora_realizada,row['AM-PM_Previsto'],row['AM-PM_Realizado'])
     
@@ -265,11 +361,11 @@ def obter_status_real(row):
         return row['Status']
     elif row['Status'] == 'Diverted':
         return row['Status']
-    elif row['Status_Atraso'] == 'red' and not (row['Status'] == 'Canceled' or row['Status'] == 'Diverted'):
+    elif (row['Status_Atraso'] == 'red' and not (row['Status'] == 'Canceled' or row['Status'] == 'Diverted'))\
+    or (row['Status_Atraso'] == 'yellow' and pd.to_datetime(row['Atraso\Antecipado']) > pd.to_datetime('00:15'))\
+    or (row['Flag'] == 'Atrasado' and pd.to_datetime(row['Atraso\Antecipado']) > pd.to_datetime('00:15')):
         return 'Delayed'
-    elif row['Status_Atraso'] == 'yellow' and pd.to_datetime(row['Atraso\Antecipado']) > pd.to_datetime('00:15'):
-        return 'Delayed'
-    elif row['Status_Atraso'] == 'gray':
+    elif row['Status_Atraso'] == 'gray'and not row['Status'] == 'Known':
         return 'Unknown'
     return 'ON-TIME'
 
