@@ -309,7 +309,13 @@ INSERT INTO [dbo].[Voos] (
 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 '''
 
+nova_ordem = ['Hora_Prevista', 'Voo', 'Origem', 'Companhia_Aerea', 'Aeronave', 'Status', 'Status_Atraso', 'Data_Voo',
+     'Direcao', 'Aeroporto', 'Tipo_Aeronave', 'Hora_Realizada', 'AM-PM_Previsto', 'Cidade_Normalizada', 'Estado_Provincia',
+    'Pais', 'Tipo_Voo', 'Flag', 'Atraso/Antecipado', 'Voo_Status_Real']
+
 voos = voos.drop('AM-PM_Realizado', axis=1)
+
+voos = voos[nova_ordem]
 
 cursor.executemany(insert_to_flights_stmt, voos.values.tolist()) 
 
