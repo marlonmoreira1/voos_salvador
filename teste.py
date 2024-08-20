@@ -362,11 +362,11 @@ def obter_status_real(row):
         return row['Status']
     elif row['Status'] == 'Diverted':
         return row['Status']
-    elif row['Status_Atraso'] == 'red' and not (row['Status'] == 'Canceled' or row['Status'] == 'Diverted'):
-        return 'Delayed'
-    elif row['Status_Atraso'] == 'yellow' and pd.to_datetime(row['Atraso\Antecipado']) > pd.to_datetime('00:15'):
-        return 'Delayed'
-    elif row['Status_Atraso'] == 'gray' or row['Status']=='Estimated':
+    elif (row['Status_Atraso'] == 'red' and not (row['Status'] == 'Canceled' or row['Status'] == 'Diverted'))\
+    or (row['Status_Atraso'] == 'yellow' and pd.to_datetime(row['Atraso\Antecipado']) > pd.to_datetime('00:15'))\
+    or (row['Flag'] == 'Atrasado' and pd.to_datetime(row['Atraso\Antecipado']) > pd.to_datetime('00:15')):
+        return 'Delayed'    
+    elif row['Status_Atraso'] == 'gray' and not row['Status'] == 'Known':
         return 'Unknown'
     return 'ON-TIME'
 
