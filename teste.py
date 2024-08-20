@@ -226,8 +226,9 @@ def obter_atraso_flag(row):
    
 
 def obter_diff(hora_prevista,hora_realizada,am_pm_previsto,am_pm_realizado):
-    
-    if hora_prevista > hora_realizada and (am_pm_previsto == am_pm_realizado):
+    if hora_prevista.hour == 0 and (am_pm_previsto == 'AM' and am_pm_realizado == 'PM'):
+        atraso = hora_prevista - hora_realizada
+    elif hora_prevista > hora_realizada and (am_pm_previsto == am_pm_realizado):
         atraso = hora_prevista - hora_realizada
     else:
         atraso = hora_realizada - hora_prevista
@@ -273,7 +274,7 @@ def obter_status_real(row):
 
 
 voos['Voo_Status_Real'] = voos.apply(obter_status_real,axis=1)
-
+voos = voos[voos['Companhia_Aerea']=='GOL Linhas Aereas']
 print(voos[['Hora_Prevista','Hora_Realizada','Voo_Status_Real','Atraso\Antecipado']].head(40))
 print(voos[['Hora_Prevista','Hora_Realizada','Atraso\Antecipado','AM-PM_Previsto','AM-PM_Realizado']].head(40))
 print(voos.columns)
