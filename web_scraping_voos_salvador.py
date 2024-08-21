@@ -310,16 +310,10 @@ def obter_atraso_flag(row):
     if result is not None:
         return result
     
-    hora_prevista = pd.to_datetime(row['Hora_Prevista'])
-    hora_realizada = pd.to_datetime(row['Hora_Realizada'])
+    hora_prevista = convert_to_24h(row['Hora_Prevista'], row['AM-PM_Previsto'],row['Status'],'previsto')
+    hora_realizada = convert_to_24h(row['Hora_Realizada'], row['AM-PM_Realizado'],row['Status'],'realizado')       
 
-    if hora_realizada.hour > 12:
-        hora_realizada -= timedelta(hours=12)
-        
-    if (hora_prevista.hour > hora_realizada.hour) or (row['AM-PM_Previsto'] == 'PM' and row['AM-PM_Realizado'] == 'AM'):            
-        hora_realizada += timedelta(hours=12)    
-
-    if hora_realizada > hora_prevista:
+    if (row['AM-PM_Previsto'] == 'PM' and row['AM-PM_Realizado'] == 'AM') or (hora_realizada > hora_prevista):
         return 'Atrasado'
     else:
         return 'ON-Time'
@@ -369,7 +363,7 @@ def obter_status_real(row):
         return row['Status']
     elif (row['Status_Atraso'] == 'red' and not (row['Status'] == 'Canceled' or row['Status'] == 'Diverted'))\
     or (row['Status_Atraso'] == 'yellow' and pd.to_datetime(row['Atraso\Antecipado']) > pd.to_datetime('00:15'))\
-    or (row['Flag'] == 'Atrasado' and pd.to_datetime(row['Atraso\Antecipado']) > pd.to_datetime('00:15')):
+    or (row['Status'] == 'Known' and pd.to_datetime(row['Atraso\Antecipado']) > pd.to_datetime('00:15')):
         return 'Delayed'
     elif row['Status_Atraso'] == 'gray'and not row['Status'] == 'Known':
         return 'Unknown'
