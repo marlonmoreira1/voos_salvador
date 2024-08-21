@@ -207,7 +207,7 @@ def atualizar_status(row):
         
         if status == 'Cancelado':
             return 'Canceled'
-        elif horario == 'Tabela não encontrada':
+        elif status == 'Tabela não encontrada':
             return row['Status']
         return 'Known'            
         
