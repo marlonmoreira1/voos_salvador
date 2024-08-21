@@ -193,7 +193,8 @@ def atualizar_hora(row):
         
         if horario == 'Cancelado':
             return row['Hora_realizada']
-
+        elif horario == 'Tabela não encontrada':
+            return row['Hora_realizada']
         return horario        
         
     return row['Hora_realizada']
@@ -206,6 +207,8 @@ def atualizar_status(row):
         
         if status == 'Cancelado':
             return 'Canceled'
+        elif horario == 'Tabela não encontrada':
+            return row['Status']
         return 'Known'            
         
     return row['Status']
