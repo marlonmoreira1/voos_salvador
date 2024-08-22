@@ -313,7 +313,7 @@ def obter_atraso_flag(row):
     hora_prevista = convert_to_24h(row['Hora_Prevista'], row['AM-PM_Previsto'],row['Status'],'previsto')
     hora_realizada = convert_to_24h(row['Hora_Realizada'], row['AM-PM_Realizado'],row['Status'],'realizado')       
 
-    if hora_realizada > hora_prevista:
+    if (hora_realizada > hora_prevista) and not (hora_prevista.hour == 0 and (row['AM-PM_Previsto'] == 'AM' and row['AM-PM_Realizado'] == 'PM')):
         return 'Atrasado'
     else:
         return 'ON-Time'
@@ -373,7 +373,7 @@ def obter_status_real(row):
 voos['Voo_Status_Real'] = voos.apply(obter_status_real,axis=1)
 gol = voos[voos['Flag']=='Atrasado']
 print(gol[['Hora_Prevista','Hora_Realizada','Voo_Status_Real','Atraso\Antecipado','Flag']].head(60))
-mudado = voos[voos['Flag']=='ON-TIME']
+mudado = voos[voos['Flag']=='ON-Time']
 print(mudado[['Hora_Prevista','Hora_Realizada','Voo_Status_Real','Atraso\Antecipado','Flag']].head(60))
 # credentials = (
 #     'Driver={ODBC Driver 17 for SQL Server};'
