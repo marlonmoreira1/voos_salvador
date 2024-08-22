@@ -313,7 +313,7 @@ def obter_atraso_flag(row):
     hora_prevista = convert_to_24h(row['Hora_Prevista'], row['AM-PM_Previsto'],row['Status'],'previsto')
     hora_realizada = convert_to_24h(row['Hora_Realizada'], row['AM-PM_Realizado'],row['Status'],'realizado')       
 
-    if (row['AM-PM_Previsto'] == 'PM' and row['AM-PM_Realizado'] == 'AM') or (hora_realizada > hora_prevista):
+    if hora_realizada > hora_prevista:
         return 'Atrasado'
     else:
         return 'ON-Time'
