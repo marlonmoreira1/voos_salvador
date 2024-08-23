@@ -311,32 +311,29 @@ def obter_atraso_flag(row):
         return result
     
     hora_prevista = convert_to_24h(row['Hora_Prevista'], row['AM-PM_Previsto'],row['Status'],'previsto')
-    hora_realizada = convert_to_24h(row['Hora_Realizada'], row['AM-PM_Realizado'],row['Status'],'realizado')       
+    hora_realizada = convert_to_24h(row['Hora_Realizada'], row['AM-PM_Realizado'],row['Status'],'realizado')
 
-    if hora_prevista.hour == 0 and (am_pm_previsto == 'AM' and am_pm_realizado == 'PM'):
-        return 'ON-Time'
-    elif hora_prevista.hour == 12 and (am_pm_previsto == 'PM' and am_pm_realizado == 'AM'):
-        return 'ON-Time'
-    elif hora_prevista > hora_realizada and (am_pm_previsto == am_pm_realizado):
-        return 'ON-Time'
-    else:
-        return 'Atrasado'
-   
+    _,flag = obter_diff(hora_prevista,hora_realizada,row['AM-PM_Previsto'],row['AM-PM_Realizado'])
+    return flag   
 
 def obter_diff(hora_prevista,hora_realizada,am_pm_previsto,am_pm_realizado):
     
     if hora_prevista.hour == 0 and (am_pm_previsto == 'AM' and am_pm_realizado == 'PM'):
         atraso = hora_prevista - hora_realizada
+        flag = 'ON-Time'
     elif hora_prevista.hour == 12 and (am_pm_previsto == 'PM' and am_pm_realizado == 'AM'):
         atraso = hora_prevista - hora_realizada
+        flag = 'ON-Time'
     elif hora_prevista > hora_realizada and (am_pm_previsto == am_pm_realizado):
         atraso = hora_prevista - hora_realizada
+        flag = 'ON-Time'
     else:
-        atraso = hora_realizada - hora_prevista    
+        atraso = hora_realizada - hora_prevista
+        flag = 'Atrasado'
     
     if atraso < timedelta(0):
         atraso += timedelta(days=1)
-    return atraso
+    return atraso, flag
 
 
 def obter_atraso_tempo(row):
@@ -349,7 +346,7 @@ def obter_atraso_tempo(row):
     hora_prevista = convert_to_24h(row['Hora_Prevista'], row['AM-PM_Previsto'],row['Status'],'previsto')
     hora_realizada = convert_to_24h(row['Hora_Realizada'], row['AM-PM_Realizado'],row['Status'],'realizado')
     
-    atraso = obter_diff(hora_prevista,hora_realizada,row['AM-PM_Previsto'],row['AM-PM_Realizado'])
+    atraso,_ = obter_diff(hora_prevista,hora_realizada,row['AM-PM_Previsto'],row['AM-PM_Realizado'])
     
     horas = atraso.seconds // 3600
     minutos = (atraso.seconds % 3600) // 60
