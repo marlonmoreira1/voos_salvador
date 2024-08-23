@@ -324,7 +324,7 @@ def obter_diff(hora_prevista,hora_realizada,am_pm_previsto,am_pm_realizado):
     elif hora_prevista.hour == 12 and (am_pm_previsto == 'PM' and am_pm_realizado == 'AM'):
         atraso = hora_prevista - hora_realizada
         flag = 'ON-Time'
-    elif hora_prevista > hora_realizada and (am_pm_previsto == am_pm_realizado):
+    elif hora_prevista >= hora_realizada and (am_pm_previsto == am_pm_realizado):
         atraso = hora_prevista - hora_realizada
         flag = 'ON-Time'
     else:
@@ -376,6 +376,8 @@ gol = voos[voos['Flag']=='ON-Time']
 print(gol[['Hora_Prevista','Hora_Realizada','Voo_Status_Real','Atraso\Antecipado','Flag']].head(55))
 mudado = voos[voos['Flag']=='Atrasado']
 print(mudado[['Hora_Prevista','Hora_Realizada','Voo_Status_Real','Atraso\Antecipado','Flag']].head(55))
+la = voos[voos['Voo']=='LA3272']
+print(la[['Hora_Prevista','Hora_Realizada','Voo_Status_Real','Atraso\Antecipado','Flag']])
 # credentials = (
 #     'Driver={ODBC Driver 17 for SQL Server};'
 #     f'Server={os.environ["AZURE_SQL_SERVER"]};'
