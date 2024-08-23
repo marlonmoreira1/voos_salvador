@@ -376,7 +376,7 @@ gol = voos[voos['Flag']=='ON-Time']
 print(gol[['Hora_Prevista','Hora_Realizada','Voo_Status_Real','Atraso\Antecipado','Flag']].head(55))
 mudado = voos[voos['Flag']=='Atrasado']
 print(mudado[['Hora_Prevista','Hora_Realizada','Voo_Status_Real','Atraso\Antecipado','Flag']].head(55))
-la = voos[voos['Voo']=='LA3272']
+la = voos[voos['Voo']=='G32150']
 print(la[['Hora_Prevista','Hora_Realizada','Voo_Status_Real','Atraso\Antecipado','Flag']])
 # credentials = (
 #     'Driver={ODBC Driver 17 for SQL Server};'
