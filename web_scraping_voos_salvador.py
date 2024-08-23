@@ -62,17 +62,14 @@ def obter_voos(url):
             EC.presence_of_element_located((By.XPATH, "//table[contains(@class, 'table-condensed') and contains(@class, 'table-hover') and contains(@class, 'data-table')]"))
         )
     html_content = element.get_attribute('outerHTML')
-
     
     soup = BeautifulSoup(html_content, 'html.parser')
-
     
     table = soup.find('table', class_='table table-condensed table-hover data-table m-n-t-15')
     flights = []
     
     if table:
         rows = table.find('tbody').find_all('tr')
-
         
         for row in rows:
             columns = row.find_all('td')
@@ -89,7 +86,6 @@ def obter_voos(url):
                 data_date = row.get('data-date')
                 first_date_obj = datetime.strptime(data_date, '%A, %b %d').replace(year=datetime.now().year)
                 first_date_str = first_date_obj.strftime('%Y-%m-%d')
-
                 
                 flights.append({
                     'Time': time,
@@ -104,7 +100,6 @@ def obter_voos(url):
     voos = pd.DataFrame(flights)
 
     return voos
-
 
 
 voos_chegada = obter_voos(arrivals_url)
@@ -150,14 +145,14 @@ def converter_data(data_str):
 
 
 def buscar_horario_chegada(numero_voo,data_desejada):
+    """Busca os horarios de chegada dos voos com status Unknown do flight radar."""
     base_url = "https://br.trip.com/flights/status-"
     url = base_url + numero_voo      
     driver.get(url)
     
     time.sleep(5)  
 
-    try:
-        
+    try:        
         data_formatada = converter_data(data_desejada)        
         
         soup = BeautifulSoup(driver.page_source, 'html.parser')        
@@ -223,6 +218,7 @@ def am_pm_realizado(row):
         else:
             return 'AM'
     return row['AM-PM_Realizado']
+    
 
 voos['Hora_realizada'] = voos.apply(atualizar_hora, axis=1)
 
@@ -235,10 +231,8 @@ url = "https://simplemaps.com/static/data/world-cities/basic/simplemaps_worldcit
 response = requests.get(url)
 zip_file = zipfile.ZipFile(BytesIO(response.content))
 
-
 with zip_file.open('worldcities.csv') as file:
     df = pd.read_csv(file)
-
 
 df['city_normalized'] = df['city'].apply(lambda x: unidecode(str(x)))
 
@@ -259,7 +253,6 @@ def obter_nacionalidade(row):
     return 'Nacional'
 
 voos['Is_National'] = voos['País'].apply(obter_nacionalidade)
-
 
 colunas_traduzidas = {
     'Time': 'Hora_Prevista',
@@ -295,7 +288,9 @@ def convert_to_24h(time_str, am_pm,status,tipo):
     if status == 'Known' and tipo == 'realizado':
         time_obj = datetime.strptime(time_str, '%H:%M')
         return time_obj
+        
     time_obj = datetime.strptime(time_str, '%I:%M')
+    
     if am_pm == 'PM' and time_obj.hour != 12:
         time_obj += timedelta(hours=12)
     elif am_pm == 'AM' and time_obj.hour == 12:
@@ -314,7 +309,8 @@ def obter_atraso_flag(row):
     hora_realizada = convert_to_24h(row['Hora_Realizada'], row['AM-PM_Realizado'],row['Status'],'realizado')
 
     _,flag = obter_diff(hora_prevista,hora_realizada,row['AM-PM_Previsto'],row['AM-PM_Realizado'])
-    return flag   
+    return flag
+    
 
 def obter_diff(hora_prevista,hora_realizada,am_pm_previsto,am_pm_realizado):
     
@@ -362,10 +358,12 @@ def obter_status_real(row):
         return row['Status']
     elif row['Status'] == 'Diverted':
         return row['Status']
+        
     elif (row['Status_Atraso'] == 'red' and not (row['Status'] == 'Canceled' or row['Status'] == 'Diverted'))\
     or (row['Status_Atraso'] == 'yellow' and pd.to_datetime(row['Atraso\Antecipado']) > pd.to_datetime('00:15'))\
     or (row['Flag'] == 'Atrasado' and pd.to_datetime(row['Atraso\Antecipado']) > pd.to_datetime('00:15')):
         return 'Delayed'
+        
     elif row['Status_Atraso'] == 'gray'and not row['Status'] == 'Known':
         return 'Unknown'
     return 'ON-TIME'
@@ -416,11 +414,9 @@ voos = voos.drop('AM-PM_Realizado', axis=1)
 
 voos = voos[nova_ordem]
 
-cursor.executemany(insert_to_flights_stmt, voos.values.tolist()) 
+cursor.executemany(insert_to_flights_stmt, voos.values.tolist())
 
-
-print(f'{len(voos)} rows inserted in Voos table')
-           
+print(f'{len(voos)} linhas inseridas na tabela Voos')           
 
 cursor.commit()        
 cursor.close()
