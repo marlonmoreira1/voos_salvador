@@ -190,7 +190,9 @@ def atualizar_hora(row):
             return row['Hora_realizada']
         elif horario == 'Tabela não encontrada' or horario == '--:--':
             return row['Hora_realizada']
-        return horario        
+        elif horario == 'Chegada':
+            return horario
+        return row['Hora_realizada']
         
     return row['Hora_realizada']
 
@@ -205,7 +207,8 @@ def atualizar_status(row):
         elif status == 'Tabela não encontrada' or status == '--:--':
             return row['Status']
         elif status == 'Chegada':
-            return 'Known'            
+            return 'Known'
+        return row['Status']
         
     return row['Status']
 
