@@ -360,10 +360,10 @@ voos['Atraso\Antecipado'] = voos.apply(obter_atraso_tempo,axis=1)
 def obter_status_real(row):
     if row['Status'] == 'Canceled':
         return row['Status']
-    elif row['Status'] == 'Diverted':
+    elif 'Diverted' in row['Status']:
         return row['Status']
         
-    elif (row['Status_Atraso'] == 'red' and not (row['Status'] == 'Canceled' or row['Status'] == 'Diverted'))\
+    elif (row['Status_Atraso'] == 'red' and not (row['Status'] == 'Canceled' or 'Diverted' in row['Status']))\
     or (row['Status_Atraso'] == 'yellow' and pd.to_datetime(row['Atraso\Antecipado']) > pd.to_datetime('00:15'))\
     or (row['Flag'] == 'Atrasado' and pd.to_datetime(row['Atraso\Antecipado']) > pd.to_datetime('00:15')):
         return 'Delayed'
