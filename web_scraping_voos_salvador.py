@@ -204,7 +204,8 @@ def atualizar_status(row):
             return 'Canceled'
         elif status == 'Tabela não encontrada' or status == '--:--':
             return row['Status']
-        return 'Known'            
+        elif status == 'Chegada':
+            return 'Known'            
         
     return row['Status']
 
