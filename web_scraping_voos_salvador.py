@@ -230,26 +230,49 @@ voos['Status'] = voos.apply(atualizar_status, axis=1)
 
 voos['AM-PM_Realizado'] = voos.apply(am_pm_realizado, axis=1)
 
-url = "https://simplemaps.com/static/data/world-cities/basic/simplemaps_worldcities_basicv1.75.zip"
+def normalize_city_name(city_name):
+    city_name = str(city_name).lower()    
+    city_name = city_name.strip()    
+    city_name = ' '.join(word.capitalize() for word in city_name.lower().split())
+    return city_name
 
-response = requests.get(url)
-zip_file = zipfile.ZipFile(BytesIO(response.content))
+airports = pd.read_csv("data/airports.csv",header=0,delimiter=',')
+countries = pd.read_csv("data/countries.csv",header=0,delimiter=',')
+states = pd.read_csv("data/regions.csv",header=0,delimiter=',')
 
-with zip_file.open('worldcities.csv') as file:
-    df = pd.read_csv(file)
+states['region'] = states['name']
+countries['country'] = countries['name']
 
-df['city_normalized'] = df['city'].apply(lambda x: unidecode(str(x)))
+airports = airports.merge(states[['region','code']],
+                                        left_on=['iso_region'],
+                                        right_on=['code'],
+                                        how='left')
 
+airports = airports.merge(countries[['country','code']],
+                                        left_on=['iso_country'],
+                                        right_on=['code'],
+                                        how='left')
 
-def obter_informacoes_geograficas(cidade):
-    resultado = df[df['city_normalized'].str.lower() == cidade.lower()][['city','admin_name', 'country']].values
+just_airports = airports[airports['iata_code'].notna()]
+
+just_airports['municipality'] = just_airports['municipality'].str.replace(r"\(.*\)", "", regex=True).str.strip()
+
+just_airports['municipality'] = just_airports['municipality'].apply(normalize_city_name)
+
+just_airports['city_normalized'] = just_airports['municipality'].apply(lambda x: unidecode(str(x)))
+
+def obter_informacoes_geograficas(cidade,iata_code):
+    cidade_str = str(cidade).lower()
+    iata_code_str = str(iata_code).lower()
+    resultado = just_airports[(just_airports['city_normalized'].str.lower() == cidade_str) & (just_airports['iata_code'].str.lower() == iata_code_str)][['municipality', 'region', 'country']].values
     if len(resultado) > 0:
         cidade, estado, pais = resultado[0]
         return cidade, estado, pais
     else:
         return None, None, None
 
-voos[['Cidade_Correta' ,'Estado/Província', 'País']] = voos['From'].apply(lambda x: pd.Series(obter_informacoes_geograficas(x)))
+voos[['Cidade_Correta' ,'Estado/Província', 'País']] = voos[['From','Aeroporto']].apply(lambda x: pd.Series(obter_informacoes_geograficas(x['From'],x['Aeroporto'])),axis=1)
+
 
 def obter_nacionalidade(row):
     if row != 'Brazil':
