@@ -55,6 +55,7 @@ def obter_voos(url):
                     EC.element_to_be_clickable((By.XPATH, "//button[@class='btn btn-table-action btn-flights-load']")))
                     
             load_more_button.click()
+            print('I m here')
             time.sleep(5)
         except:
             break
