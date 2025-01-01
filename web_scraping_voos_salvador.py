@@ -262,7 +262,8 @@ just_airports['municipality'] = just_airports['municipality'].str.replace(r"\(.*
 just_airports['municipality'] = just_airports['municipality'].apply(normalize_city_name)
 
 just_airports['city_normalized'] = just_airports['municipality'].apply(lambda x: unidecode(str(x)))
-
+print(just_airports)
+print(voos[['From','Aeroporto']])
 def obter_informacoes_geograficas(cidade,iata_code):
     cidade_str = str(cidade).lower()
     iata_code_str = str(iata_code).lower()
