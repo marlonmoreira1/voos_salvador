@@ -121,7 +121,7 @@ voos_partida['direcao'] = 'embarque'
 voos_chegada['direcao'] = 'desembarque'
 
 voos = pd.concat([voos_partida, voos_chegada], ignore_index=True)
-
+print(voos)
 voos[['From', 'Aeroporto']] = voos['From'].str.extract(r'(.+)\((.+)\)-')
 
 voos['Airline'] = voos['Airline'].str.replace(r'\s*\(.*?\)-', '', regex=True)
@@ -262,8 +262,8 @@ just_airports['municipality'] = just_airports['municipality'].str.replace(r"\(.*
 just_airports['municipality'] = just_airports['municipality'].apply(normalize_city_name)
 
 just_airports['city_normalized'] = just_airports['municipality'].apply(lambda x: unidecode(str(x)))
-print(just_airports)
-print(voos[['From','Aeroporto']])
+
+
 def obter_informacoes_geograficas(cidade,iata_code):
     cidade_str = str(cidade).lower()
     iata_code_str = str(iata_code).lower()
