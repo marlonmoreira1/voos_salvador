@@ -111,10 +111,10 @@ time.sleep(10)
 
 voos_partida = obter_voos(departures_url)
 
-# data_hoje = datetime.today()
-# data_ontem = data_hoje - timedelta(days=1)
-# data_filtro = data_ontem.strftime('%Y-%m-%d')
-data_filtro = datetime(2025, 1, 1).strftime('%Y-%m-%d')
+data_hoje = datetime.today()
+data_ontem = data_hoje - timedelta(days=1)
+data_filtro = data_ontem.strftime('%Y-%m-%d')
+
 voos_partida = voos_partida[voos_partida['date_flight']==data_filtro]
 voos_chegada = voos_chegada[voos_chegada['date_flight']==data_filtro]
 
