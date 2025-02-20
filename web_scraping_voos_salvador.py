@@ -54,8 +54,7 @@ def obter_voos(url):
             load_more_button = WebDriverWait(driver, 10).until(
                     EC.element_to_be_clickable((By.XPATH, "//button[@class='btn btn-table-action btn-flights-load']")))
                     
-            load_more_button.click()
-            print('I m here')
+            load_more_button.click()            
             time.sleep(5)
         except:
             break
@@ -411,13 +410,13 @@ credentials = (
 )
 
 
-max_retries = 3
+max_retries = 10
 attempt = 0
 connected = False
 
 while attempt < max_retries and not connected:
     try:
-        conn = pyodbc.connect(credentials,timeout=20)		
+        conn = pyodbc.connect(credentials,timeout=30)		
         connected = True
     except pyodbc.Error as e:
         print(f"Connection attempt {attempt + 1} failed: {e}")
