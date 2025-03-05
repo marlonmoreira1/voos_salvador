@@ -25,7 +25,7 @@ options.add_argument('--headless')
 options.add_argument('--no-sandbox')
 options.add_argument('--disable-dev-shm-usage')
 
-driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
+driver_flight = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
 
 arrivals_url = 'https://www.flightradar24.com/data/airports/ssa/arrivals'
 departures_url = 'https://www.flightradar24.com/data/airports/ssa/departures'
@@ -42,25 +42,23 @@ def fechar_overlay():
         print("Overlay não encontrado ou erro ao fechá-lo:", e)
 
 
-def obter_voos(url):
-    import time
-    url = url
+def obter_voos(url,driver):    
     driver.get(url)
 
-    fechar_overlay()
+    #fechar_overlay()
 
     while True:
         try:
-            load_more_button = WebDriverWait(driver, 60).until(
+            load_more_button = WebDriverWait(driver, 10).until(
                     EC.element_to_be_clickable((By.XPATH, "//button[@class='btn btn-table-action btn-flights-load']")))
                     
             load_more_button.click()            
-            time.sleep(5)
+            time.sleep(1)
         except:
             break
             
-    time.sleep(5)
-    element = WebDriverWait(driver, 90).until(
+    time.sleep(1)
+    element = WebDriverWait(driver, 20).until(
             EC.presence_of_element_located((By.XPATH, "//table[contains(@class, 'table-condensed') and contains(@class, 'table-hover') and contains(@class, 'data-table')]"))
         )
     html_content = element.get_attribute('outerHTML')
@@ -77,7 +75,7 @@ def obter_voos(url):
             columns = row.find_all('td')
             if len(columns) > 1:
 
-                time = columns[0].get_text(strip=True)
+                time_flight = columns[0].get_text(strip=True)
                 flight = columns[1].get_text(strip=True)
                 origin = columns[2].get_text(strip=True)
                 airline = columns[3].get_text(strip=True)
@@ -90,7 +88,7 @@ def obter_voos(url):
                 first_date_str = first_date_obj.strftime('%Y-%m-%d')
                 
                 flights.append({
-                    'Time': time,
+                    'Time': time_flight,
                     'Flight': flight,
                     'From': origin,
                     'Airline': airline,
@@ -104,11 +102,11 @@ def obter_voos(url):
     return voos
 
 
-voos_chegada = obter_voos(arrivals_url)
+voos_chegada = obter_voos(arrivals_url,driver_flight)
 
-time.sleep(10)
+time.sleep(1)
 
-voos_partida = obter_voos(departures_url)
+voos_partida = obter_voos(departures_url,driver_flight)
 
 data_hoje = datetime.today()
 data_ontem = data_hoje - timedelta(days=1)
@@ -421,7 +419,7 @@ while attempt < max_retries and not connected:
     except pyodbc.Error as e:
         print(f"Connection attempt {attempt + 1} failed: {e}")
         attempt += 1
-        time.sleep(10)
+        time.sleep(2)
 
 cursor = conn.cursor()
 
